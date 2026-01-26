@@ -8,6 +8,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -718,6 +720,71 @@
         .criteria-title { font-size: 14px; margin-bottom: 10px; }
         .criteria-list { list-style: none; padding: 0; }
         .criteria-list li { font-size: 12px; margin-bottom: 6px; padding-left: 20px; position: relative; }
+
+        /* ELIGIBILITY SUMMARY */
+        .eligibility-summary {
+            background: #f8f9fa;
+            border: 3px solid #004080;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .eligibility-summary.eligible { border-color: #28a745; background: #d4edda; }
+        .eligibility-summary.not-eligible { border-color: #dc3545; background: #f8d7da; }
+        .eligibility-result {
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .eligibility-result.eligible { background: #28a745; color: #ffffff; }
+        .eligibility-result.not-eligible { background: #dc3545; color: #ffffff; }
+        .eligibility-result.pending { background: #ffc107; color: #000000; }
+        .criteria-summary-section {
+            margin-bottom: 15px;
+        }
+        .criteria-summary-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        .criteria-summary-title.inclusion { background: #28a745; color: #ffffff; }
+        .criteria-summary-title.exclusion { background: #dc3545; color: #ffffff; }
+        .criteria-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            background: #ffffff;
+            border-radius: 4px;
+            font-size: 12px;
+            border-left: 4px solid #dee2e6;
+        }
+        .criteria-item.met { border-left-color: #28a745; }
+        .criteria-item.not-met { border-left-color: #dc3545; }
+        .criteria-item.pending { border-left-color: #ffc107; }
+        .criteria-status {
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        .criteria-status.yes { background: #28a745; color: #ffffff; }
+        .criteria-status.no { background: #dc3545; color: #ffffff; }
+        .criteria-status.pending { background: #ffc107; color: #000000; }
+        .eligibility-note-box {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e7f3ff;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #004080;
+        }
         .criteria-list li::before { content: "•"; position: absolute; left: 5px; color: #004080; }
 
         /* CONSENT INFO BOX */
@@ -850,10 +917,10 @@
         .btn-submit:hover:not(:disabled) { background: #218838; border-color: #218838; }
         .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* VOUCHER MODAL */
+        /* VOUCHER MODAL - 10 Voucher Grid for PDF */
         .voucher-modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.85);
             display: none; justify-content: center; align-items: flex-start;
             z-index: 3000; padding: 20px; overflow-y: auto;
         }
@@ -863,53 +930,182 @@
             border-radius: 12px;
             max-width: 900px;
             width: 100%;
-            border: 4px double #004080;
             margin: 20px auto;
+            border: 4px solid #004080;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
         .voucher-header {
-            background: #004080;
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
             color: #ffffff;
-            padding: 15px 20px;
+            padding: 18px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-radius: 8px 8px 0 0;
         }
-        .voucher-title { font-size: 16px; }
-        .voucher-close { background: none; border: none; color: #ffffff; font-size: 24px; cursor: pointer; }
-        .voucher-content { padding: 20px; }
-        .vouchers-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .voucher-title { font-size: 18px; font-weight: 700; letter-spacing: 1px; }
+        .voucher-close { background: none; border: none; color: #ffffff; font-size: 28px; cursor: pointer; transition: transform 0.2s; }
+        .voucher-close:hover { transform: scale(1.2); }
+        .voucher-content { padding: 25px; background: #f5f7fa; }
+        
+        /* Voucher Page Container */
+        .voucher-page {
+            background: #ffffff;
+            border: 3px solid #004080;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .voucher-page-header {
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px double #004080;
+            margin-bottom: 20px;
+        }
+        .voucher-page-logo { width: 70px; margin-bottom: 10px; border-radius: 8px; }
+        .voucher-page-title {
+            font-size: 16px; font-weight: 700; color: #004080;
+            margin-bottom: 5px; letter-spacing: 1px;
+        }
+        .voucher-page-subtitle { font-size: 12px; color: #666; }
+        .voucher-page-patient {
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .voucher-page-patient-id { font-size: 22px; font-weight: 700; }
+        .voucher-page-patient-info { font-size: 11px; text-align: right; }
+        
+        /* 10 Voucher Grid */
+        .vouchers-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
         .voucher-card {
             border: 2px solid #004080;
             border-radius: 8px;
-            padding: 15px;
+            padding: 10px;
             text-align: center;
-            page-break-inside: avoid;
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .voucher-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,64,128,0.2);
         }
         .voucher-card-header {
             background: #004080;
             color: #ffffff;
-            padding: 8px;
-            margin: -15px -15px 10px -15px;
+            padding: 6px 8px;
+            margin: -10px -10px 10px -10px;
             border-radius: 6px 6px 0 0;
-            font-size: 12px;
-        }
-        .voucher-patient-id { font-size: 14px; font-weight: 700; color: #004080; margin-bottom: 5px; }
-        .voucher-qr-container { margin: 10px auto; }
-        .voucher-day-label { font-size: 18px; font-weight: 700; margin-top: 10px; }
-        .voucher-info-small { font-size: 10px; color: #666; margin-top: 5px; }
-        .voucher-buttons { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
-        .voucher-btn {
-            padding: 12px 30px;
-            border-radius: 6px;
             font-size: 13px;
             font-weight: 700;
+        }
+        .voucher-card-header.day-0 { background: #28a745; }
+        .voucher-qr-container {
+            background: #ffffff;
+            padding: 8px;
+            border-radius: 6px;
+            display: inline-block;
+            border: 1px solid #dee2e6;
+        }
+        .voucher-qr-container canvas { display: block; }
+        .voucher-day-label {
+            margin-top: 8px;
+            font-size: 10px;
+            color: #666;
+            font-weight: 600;
+        }
+        .voucher-info-small {
+            margin-top: 6px;
+            font-size: 9px;
+            color: #888;
+            padding-top: 6px;
+            border-top: 1px dashed #dee2e6;
+        }
+        
+        /* Voucher Footer */
+        .voucher-page-footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #004080;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            color: #666;
+        }
+        .voucher-page-footer-left { text-align: left; }
+        .voucher-page-footer-right { text-align: right; color: #004080; font-weight: 600; }
+        
+        /* Voucher Buttons */
+        .voucher-buttons { 
+            display: flex; 
+            gap: 15px; 
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .voucher-btn {
+            padding: 14px 35px; 
+            border-radius: 8px;
+            font-size: 14px; 
+            font-weight: 700; 
             cursor: pointer;
             font-family: 'Oswald', Arial, sans-serif;
-            text-transform: uppercase;
-            border: 2px solid;
+            text-transform: uppercase; 
+            border: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .voucher-btn.print { background: #004080; color: #ffffff; border-color: #004080; }
-        .voucher-btn.close-btn { background: #6c757d; color: #ffffff; border-color: #6c757d; }
+        .voucher-btn.pdf { 
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); 
+            color: #ffffff; 
+        }
+        .voucher-btn.pdf:hover { 
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220,53,69,0.4);
+        }
+        .voucher-btn.print { 
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%); 
+            color: #ffffff; 
+        }
+        .voucher-btn.print:hover { 
+            background: linear-gradient(135deg, #0056b3 0%, #0077dd 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,64,128,0.4);
+        }
+        .voucher-btn.close-btn { 
+            background: #6c757d; 
+            color: #ffffff; 
+        }
+        .voucher-btn.close-btn:hover { 
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        @media print {
+            body * { visibility: hidden; }
+            .voucher-page, .voucher-page * { visibility: visible; }
+            .voucher-page { position: absolute; left: 0; top: 0; width: 100%; }
+            .voucher-buttons { display: none; }
+        }
+        
+        @media (max-width: 768px) {
+            .vouchers-grid { grid-template-columns: repeat(2, 1fr); }
+            .voucher-container { max-width: 100%; margin: 10px; }
+        }
 
         /* QR SCANNER */
         .scanner-modal {
@@ -1253,18 +1449,46 @@
         </div>
     </div>
 
-    <!-- VOUCHER MODAL -->
+    <!-- VOUCHER MODAL - 10 Voucher Grid for PDF -->
     <div class="voucher-modal" id="voucherModal">
         <div class="voucher-container">
             <div class="voucher-header">
-                <span class="voucher-title">PATIENT VOUCHERS (10 Days)</span>
+                <span class="voucher-title">🎫 PATIENT VOUCHERS (10 DAYS)</span>
                 <button class="voucher-close" onclick="closeVoucherModal()">&times;</button>
             </div>
             <div class="voucher-content">
-                <div class="vouchers-grid" id="vouchersGrid"></div>
+                <div class="voucher-page" id="voucherPage">
+                    <div class="voucher-page-header">
+                        <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="Logo" class="voucher-page-logo">
+                        <div class="voucher-page-title">THERAPEUTIC EFFICACY STUDY 2026</div>
+                        <div class="voucher-page-subtitle">National Malaria Control Programme - Sierra Leone</div>
+                    </div>
+                    <div class="voucher-page-patient">
+                        <div class="voucher-page-patient-id" id="voucherPatientId">---</div>
+                        <div class="voucher-page-patient-info">
+                            <div id="voucherPatientName">---</div>
+                            <div id="voucherPatientHC">---</div>
+                            <div id="voucherPatientDate">---</div>
+                        </div>
+                    </div>
+                    <div class="vouchers-grid" id="vouchersGrid">
+                        <!-- 10 voucher cards will be generated here -->
+                    </div>
+                    <div class="voucher-page-footer">
+                        <div class="voucher-page-footer-left">
+                            <div>Follow-up Days: 0, 1, 2, 3, 7, 14, 21, 28, 35, 42</div>
+                            <div>Present this voucher at each visit</div>
+                        </div>
+                        <div class="voucher-page-footer-right">
+                            <div>ICF-SL © 2026</div>
+                            <div>Scan QR for verification</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="voucher-buttons">
-                    <button class="voucher-btn print" onclick="printVouchers()">PRINT VOUCHERS</button>
-                    <button class="voucher-btn close-btn" onclick="closeVoucherModal()">CLOSE</button>
+                    <button class="voucher-btn pdf" onclick="downloadVoucherPDF()">📄 DOWNLOAD PDF</button>
+                    <button class="voucher-btn print" onclick="printVouchers()">🖨️ PRINT</button>
+                    <button class="voucher-btn close-btn" onclick="closeVoucherModal()">✖ CLOSE</button>
                 </div>
             </div>
         </div>
@@ -1699,41 +1923,36 @@
                 ]
             },
             {
-                title: 'Inclusion Criteria',
-                description: 'Patient must meet ALL inclusion criteria',
-                showCriteria: true,
-                criteriaType: 'inclusion',
-                criteriaItems: [
-                    'age between 6 months to 59 months old',
-                    'mono-infection with P. falciparum detected by microscopy',
-                    'parasitaemia of 2000 – 200 000/µl asexual forms',
-                    'temperature ≥ 37.5 °C or history of fever within the last 24 hours',
-                    'ability to swallow oral medication',
-                    'ability and willingness to comply with the study protocol for the duration of the study and to comply with the study visit schedule',
-                    'informed consent from the parent or guardian of children'
-                ],
+                title: 'Inclusion Criteria Assessment',
+                description: 'Assess each inclusion criterion - ALL must be YES for eligibility',
                 fields: [
-                    { name: 'meets_all_inclusion', label: 'Does the patient meet all the inclusion criteria?', type: 'checkbox_group', options: ['Yes', 'No'], required: true, eligibility_note: '(If no, patient is not eligible)' }
+                    { name: 'ic_age', label: 'Age between 6 months to 59 months?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_mono_infection', label: 'Mono-infection with P. falciparum detected by microscopy?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_parasitaemia', label: 'Parasitaemia of 2,000 – 200,000/µl asexual forms?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_fever', label: 'Temperature ≥37.5°C or history of fever within the last 24 hours?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_oral_meds', label: 'Ability to swallow oral medication?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_comply', label: 'Ability and willingness to comply with study protocol?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_consent', label: 'Informed consent from parent/guardian obtained?', type: 'checkbox_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
-                title: 'Exclusion Criteria',
-                description: 'Patient is NOT eligible if ANY apply',
-                showCriteria: true,
-                criteriaType: 'exclusion',
-                criteriaItems: [
-                    'presence of general danger signs in children aged under 5 years or signs of severe falciparum malaria according to the definitions of WHO (Appendix 1)',
-                    'weight under 5 kg',
-                    'mixed or mono-infection with another Plasmodium species detected by microscopy',
-                    'Presence of severe malnutrition (defined as a child who has a Mid Upper Arm Circumference [MUAC] <110 mm)',
-                    'presence of febrile conditions due to diseases other than malaria (e.g. measles, acute lower respiratory tract infection, severe diarrhea with dehydration) or other known underlying chronic or severe diseases (e.g. cardiac, renal and hepatic diseases, HIV/AIDS)',
-                    'regular medication, which may interfere with antimalarial pharmacokinetics',
-                    'history of hypersensitivity reactions or contraindications to any of the medicine(s) being tested or used as alternative treatment(s)'
-                ],
+                title: 'Exclusion Criteria Assessment',
+                description: 'Assess each exclusion criterion - ANY YES means NOT eligible',
                 fields: [
-                    { name: 'meets_any_exclusion', label: 'Does the patient meet any of the exclusion criteria?', type: 'checkbox_group', options: ['Yes', 'No'], required: true, eligibility_note: '(If yes, the patient is not eligible)' },
-                    { name: 'exclusion_reason', label: 'If yes, please specify the reason for exclusion:', type: 'textarea', required: false }
+                    { name: 'ec_danger_signs', label: 'Presence of general danger signs or signs of severe falciparum malaria?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_weight_under_5kg', label: 'Weight under 5 kg?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_mixed_infection', label: 'Mixed or mono-infection with another Plasmodium species detected by microscopy?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_malnutrition', label: 'Severe malnutrition (MUAC <110mm)?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_other_febrile', label: 'Other febrile conditions (measles, acute LRTI, severe diarrhea) or known chronic/severe diseases?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_interfering_meds', label: 'Regular medication which may interfere with antimalarial pharmacokinetics?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_hypersensitivity', label: 'History of hypersensitivity reactions or contraindications to test medicines?', type: 'checkbox_group', options: ['Yes', 'No'], required: true }
                 ]
+            },
+            {
+                title: 'Eligibility Summary',
+                description: 'Auto-calculated eligibility based on criteria above',
+                isEligibilitySummary: true,
+                fields: []
             },
             {
                 title: 'Patient Informed Consent and Assent',
@@ -2121,6 +2340,48 @@
                     html += section.infoContent;
                 }
                 
+                // Eligibility Summary Section (auto-calculated)
+                if (section.isEligibilitySummary) {
+                    html += `<div class="eligibility-summary" id="eligibilitySummary">
+                        <div class="eligibility-result pending" id="eligibilityResult">
+                            ⏳ CALCULATING ELIGIBILITY...
+                        </div>
+                        
+                        <div class="criteria-summary-section">
+                            <div class="criteria-summary-title inclusion">✓ INCLUSION CRITERIA (All must be YES)</div>
+                            <div id="inclusionSummaryItems">
+                                <div class="criteria-item pending"><span>Age 6-59 months</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Mono-infection P. falciparum</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Parasitaemia 2,000-200,000/µl</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Fever ≥37.5°C or history</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Ability to swallow oral meds</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Willingness to comply</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Informed consent obtained</span><span class="criteria-status pending">--</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="criteria-summary-section">
+                            <div class="criteria-summary-title exclusion">✗ EXCLUSION CRITERIA (All must be NO)</div>
+                            <div id="exclusionSummaryItems">
+                                <div class="criteria-item pending"><span>Danger signs/severe malaria</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Weight under 5 kg</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Mixed Plasmodium infection</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Severe malnutrition</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Other febrile/chronic conditions</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Interfering medications</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Hypersensitivity to medicines</span><span class="criteria-status pending">--</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="eligibility-note-box">
+                            <strong>Note:</strong> Eligibility is automatically calculated based on your responses in the Inclusion and Exclusion Criteria sections.
+                            The patient must meet ALL inclusion criteria (Yes) and NONE of the exclusion criteria (all No) to be eligible.
+                        </div>
+                    </div>
+                    <input type="hidden" name="is_eligible" id="is_eligible_field" value="">
+                    <input type="hidden" name="eligibility_reason" id="eligibility_reason_field" value="">`;
+                }
+                
                 // Criteria list if applicable
                 if (section.showCriteria && section.criteriaItems) {
                     const boxClass = section.criteriaType === 'inclusion' ? 'inclusion' : 'exclusion';
@@ -2158,6 +2419,8 @@
                 initAllSignaturePads();
                 // Setup age calculator
                 setupAgeCalculator();
+                // Setup eligibility calculator listeners
+                setupEligibilityCalculator();
             }, 200);
         }
 
@@ -2354,6 +2617,153 @@
             if (monthsField) {
                 monthsField.addEventListener('input', updateAgeDisplay);
             }
+        }
+
+        // ============================================
+        // ELIGIBILITY CALCULATOR
+        // ============================================
+        function setupEligibilityCalculator() {
+            // Inclusion criteria fields
+            const inclusionFields = ['ic_age', 'ic_mono_infection', 'ic_parasitaemia', 'ic_fever', 'ic_oral_meds', 'ic_comply', 'ic_consent'];
+            // Exclusion criteria fields
+            const exclusionFields = ['ec_danger_signs', 'ec_weight_under_5kg', 'ec_mixed_infection', 'ec_malnutrition', 'ec_other_febrile', 'ec_interfering_meds', 'ec_hypersensitivity'];
+            
+            // Add change listeners to all eligibility fields
+            [...inclusionFields, ...exclusionFields].forEach(fieldName => {
+                const checkboxes = document.querySelectorAll(`input[name="${fieldName}"]`);
+                checkboxes.forEach(cb => {
+                    cb.addEventListener('change', calculateEligibility);
+                });
+            });
+        }
+
+        function calculateEligibility() {
+            const inclusionCriteria = [
+                { field: 'ic_age', label: 'Age 6-59 months' },
+                { field: 'ic_mono_infection', label: 'Mono-infection P. falciparum' },
+                { field: 'ic_parasitaemia', label: 'Parasitaemia 2,000-200,000/µl' },
+                { field: 'ic_fever', label: 'Fever ≥37.5°C or history' },
+                { field: 'ic_oral_meds', label: 'Ability to swallow oral meds' },
+                { field: 'ic_comply', label: 'Willingness to comply' },
+                { field: 'ic_consent', label: 'Informed consent obtained' }
+            ];
+            
+            const exclusionCriteria = [
+                { field: 'ec_danger_signs', label: 'Danger signs/severe malaria' },
+                { field: 'ec_weight_under_5kg', label: 'Weight under 5 kg' },
+                { field: 'ec_mixed_infection', label: 'Mixed Plasmodium infection' },
+                { field: 'ec_malnutrition', label: 'Severe malnutrition' },
+                { field: 'ec_other_febrile', label: 'Other febrile/chronic conditions' },
+                { field: 'ec_interfering_meds', label: 'Interfering medications' },
+                { field: 'ec_hypersensitivity', label: 'Hypersensitivity to medicines' }
+            ];
+            
+            let allInclusionMet = true;
+            let anyExclusionMet = false;
+            let allFieldsFilled = true;
+            let reasons = [];
+            
+            // Check inclusion criteria (all must be Yes)
+            let inclusionHtml = '';
+            inclusionCriteria.forEach(criterion => {
+                const value = getCheckboxGroupValue(criterion.field);
+                let statusClass = 'pending';
+                let statusText = '--';
+                let itemClass = 'pending';
+                
+                if (value === 'Yes') {
+                    statusClass = 'yes';
+                    statusText = 'YES ✓';
+                    itemClass = 'met';
+                } else if (value === 'No') {
+                    statusClass = 'no';
+                    statusText = 'NO ✗';
+                    itemClass = 'not-met';
+                    allInclusionMet = false;
+                    reasons.push(`Inclusion not met: ${criterion.label}`);
+                } else {
+                    allFieldsFilled = false;
+                }
+                
+                inclusionHtml += `<div class="criteria-item ${itemClass}">
+                    <span>${criterion.label}</span>
+                    <span class="criteria-status ${statusClass}">${statusText}</span>
+                </div>`;
+            });
+            
+            // Check exclusion criteria (all must be No)
+            let exclusionHtml = '';
+            exclusionCriteria.forEach(criterion => {
+                const value = getCheckboxGroupValue(criterion.field);
+                let statusClass = 'pending';
+                let statusText = '--';
+                let itemClass = 'pending';
+                
+                if (value === 'No') {
+                    statusClass = 'yes';
+                    statusText = 'NO ✓';
+                    itemClass = 'met';
+                } else if (value === 'Yes') {
+                    statusClass = 'no';
+                    statusText = 'YES ✗';
+                    itemClass = 'not-met';
+                    anyExclusionMet = true;
+                    reasons.push(`Exclusion present: ${criterion.label}`);
+                } else {
+                    allFieldsFilled = false;
+                }
+                
+                exclusionHtml += `<div class="criteria-item ${itemClass}">
+                    <span>${criterion.label}</span>
+                    <span class="criteria-status ${statusClass}">${statusText}</span>
+                </div>`;
+            });
+            
+            // Update the summary display
+            const inclusionContainer = document.getElementById('inclusionSummaryItems');
+            const exclusionContainer = document.getElementById('exclusionSummaryItems');
+            const resultDiv = document.getElementById('eligibilityResult');
+            const summaryDiv = document.getElementById('eligibilitySummary');
+            
+            if (inclusionContainer) inclusionContainer.innerHTML = inclusionHtml;
+            if (exclusionContainer) exclusionContainer.innerHTML = exclusionHtml;
+            
+            // Determine overall eligibility
+            const isEligible = allInclusionMet && !anyExclusionMet;
+            
+            if (resultDiv && summaryDiv) {
+                if (!allFieldsFilled) {
+                    resultDiv.className = 'eligibility-result pending';
+                    resultDiv.innerHTML = '⏳ COMPLETE ALL CRITERIA TO SEE ELIGIBILITY';
+                    summaryDiv.className = 'eligibility-summary';
+                } else if (isEligible) {
+                    resultDiv.className = 'eligibility-result eligible';
+                    resultDiv.innerHTML = '✅ PATIENT IS ELIGIBLE';
+                    summaryDiv.className = 'eligibility-summary eligible';
+                } else {
+                    resultDiv.className = 'eligibility-result not-eligible';
+                    resultDiv.innerHTML = '❌ PATIENT IS NOT ELIGIBLE';
+                    summaryDiv.className = 'eligibility-summary not-eligible';
+                }
+            }
+            
+            // Update hidden fields for form submission
+            const eligibleField = document.getElementById('is_eligible_field');
+            const reasonField = document.getElementById('eligibility_reason_field');
+            
+            if (eligibleField) {
+                eligibleField.value = allFieldsFilled ? (isEligible ? 'Yes' : 'No') : '';
+            }
+            if (reasonField) {
+                reasonField.value = reasons.join('; ');
+            }
+            
+            return { isEligible, allFieldsFilled, reasons };
+        }
+
+        function getCheckboxGroupValue(fieldName) {
+            const checkedBox = document.querySelector(`input[name="${fieldName}"]:checked`);
+            return checkedBox ? checkedBox.value : null;
         }
 
         // Cascading dropdown handlers
@@ -2584,15 +2994,21 @@
             const patientId = document.getElementById('patient_id').value;
             const day = parseInt(document.getElementById('follow_up_day').value);
             
-            // Eligibility check for screening
+            // For screening, get the auto-calculated eligibility from hidden fields
+            let isEligible = false;
+            let eligibilityReason = '';
+            
             if (state.currentMode === 'screening') {
-                const meetsInclusion = formData.getAll('meets_all_inclusion').includes('Yes');
-                const meetsExclusion = formData.getAll('meets_any_exclusion').includes('Yes');
-                const otherSpecies = formData.getAll('other_species_present').includes('Yes');
-                const parasiteRange = formData.getAll('parasites_1_200_per_6wbc').includes('Yes');
+                // Calculate eligibility one more time to ensure accuracy
+                const eligibilityResult = calculateEligibility();
                 
-                const isEligible = meetsInclusion && !meetsExclusion && !otherSpecies && parasiteRange;
-                formData.append('is_eligible', isEligible ? 'Yes' : 'No');
+                if (!eligibilityResult.allFieldsFilled) {
+                    showNotification('Please complete all inclusion and exclusion criteria before submitting.', 'error');
+                    return;
+                }
+                
+                isEligible = eligibilityResult.isEligible;
+                eligibilityReason = eligibilityResult.reasons.join('; ');
             }
             
             // Check duplicate
@@ -2623,19 +3039,27 @@
             for (const [key, values] of Object.entries(checkboxGroups)) {
                 data[key] = values.join(', ');
             }
+            
+            // Add eligibility data for screening
+            if (state.currentMode === 'screening') {
+                data.is_eligible = isEligible ? 'Yes' : 'No';
+                data.eligibility_reason = eligibilityReason;
+            }
 
             state.submissions[submissionKey] = data;
             
             // Save patient for screening
-            if (state.currentMode === 'screening' && data.is_eligible === 'Yes') {
+            if (state.currentMode === 'screening' && isEligible) {
                 state.patients[patientId] = {
                     patientId: patientId,
                     patientName: data.patient_name,
                     healthCentre: data.health_centre_name,
                     district: data.district,
+                    enrollmentDate: data.date_of_visit || new Date().toISOString().split('T')[0],
                     screeningDate: data.date_of_visit || new Date().toISOString().split('T')[0],
                     ageYears: data.estimated_age_years || 0,
                     ageMonths: data.estimated_age_months || 0,
+                    ageInMonths: (parseInt(data.estimated_age_years || 0) * 12) + parseInt(data.estimated_age_months || 0),
                     ageDisplay: data.age_display || '',
                     sex: data.sex,
                     weight: data.weight_kg,
@@ -2659,10 +3083,10 @@
                 saveOffline(data);
             }
             
-            if (state.currentMode === 'screening' && data.is_eligible === 'Yes') {
+            if (state.currentMode === 'screening' && isEligible) {
                 showVouchers(patientId, data);
-            } else if (state.currentMode === 'screening' && data.is_eligible === 'No') {
-                showNotification('Patient is NOT ELIGIBLE. Screening data saved.', 'warning');
+            } else if (state.currentMode === 'screening' && !isEligible) {
+                showNotification(`Patient is NOT ELIGIBLE. Reason: ${eligibilityReason || 'Criteria not met'}`, 'warning');
                 resetForm();
             } else {
                 showNotification(`Day ${day} data submitted successfully!`, 'success');
@@ -2734,31 +3158,62 @@
         }
 
         // ============================================
-        // VOUCHER FUNCTIONS
+        // VOUCHER FUNCTIONS - Single Voucher Per Patient
         // ============================================
         function showVouchers(patientId, data) {
             const patient = state.patients[patientId];
             if (!patient) return;
             
-            const vouchersGrid = document.getElementById('vouchersGrid');
-            let html = '';
+            // Populate header fields
+            document.getElementById('voucherPatientId').textContent = patientId;
+            document.getElementById('voucherPatientName').textContent = patient.patientName || '---';
+            document.getElementById('voucherPatientHC').textContent = patient.healthCentre || '---';
+            document.getElementById('voucherPatientDate').textContent = patient.enrollmentDate || '---';
             
-            CONFIG.FOLLOW_UP_DAYS.forEach((day) => {
-                html += `<div class="voucher-card" id="voucher_day${day}">
-                    <div class="voucher-card-header">TES 2026 - SIERRA LEONE</div>
-                    <div class="voucher-patient-id">${patientId}</div>
-                    <div class="voucher-qr-container" id="qr_day${day}"></div>
-                    <div class="voucher-day-label">DAY ${day}</div>
-                    <div class="voucher-info-small">${patient.patientName || '---'}<br>HF: ${patient.healthCentre || '---'}</div>
-                </div>`;
-            });
+            // Define all 10 follow-up days
+            const followUpDays = [0, 1, 2, 3, 7, 14, 21, 28, 35, 42];
             
-            vouchersGrid.innerHTML = html;
+            // Generate 10 voucher cards with QR codes
+            const grid = document.getElementById('vouchersGrid');
+            grid.innerHTML = '';
             
-            CONFIG.FOLLOW_UP_DAYS.forEach((day) => {
-                const qrContainer = document.getElementById(`qr_day${day}`);
-                const qrData = JSON.stringify({ id: patientId, day: day, name: patient.patientName, hf: patient.healthCentre });
-                new QRCode(qrContainer, { text: qrData, width: 80, height: 80, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+            followUpDays.forEach((day, index) => {
+                const card = document.createElement('div');
+                card.className = 'voucher-card';
+                
+                const headerClass = day === 0 ? 'voucher-card-header day-0' : 'voucher-card-header';
+                const dayLabel = day === 0 ? 'ENROLLMENT' : `Day ${day}`;
+                
+                card.innerHTML = `
+                    <div class="${headerClass}">${dayLabel}</div>
+                    <div class="voucher-qr-container" id="qr_day_${day}"></div>
+                    <div class="voucher-day-label">${patient.patientName ? patient.patientName.split(' ')[0] : patientId}</div>
+                    <div class="voucher-info-small">${patient.healthCentre ? patient.healthCentre.substring(0, 15) : '---'}</div>
+                `;
+                
+                grid.appendChild(card);
+                
+                // Generate QR code for this day
+                setTimeout(() => {
+                    const qrContainer = document.getElementById(`qr_day_${day}`);
+                    if (qrContainer) {
+                        const qrData = JSON.stringify({
+                            id: patientId,
+                            day: day,
+                            hc: patient.healthCentre,
+                            name: patient.patientName
+                        });
+                        
+                        new QRCode(qrContainer, {
+                            text: qrData,
+                            width: 80,
+                            height: 80,
+                            colorDark: "#004080",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+                    }
+                }, index * 50); // Stagger QR code generation
             });
             
             document.getElementById('voucherModal').classList.add('show');
@@ -2770,19 +3225,65 @@
         }
 
         function printVouchers() {
-            const printContent = document.getElementById('vouchersGrid').innerHTML;
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`<html><head><title>TES Patient Vouchers</title>
-                <style>body{font-family:Arial;padding:20px}.vouchers-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
-                .voucher-card{border:2px solid #004080;border-radius:8px;padding:15px;text-align:center;page-break-inside:avoid}
-                .voucher-card-header{background:#004080;color:white;padding:8px;margin:-15px -15px 10px -15px;border-radius:6px 6px 0 0;font-size:12px}
-                .voucher-patient-id{font-size:14px;font-weight:bold;color:#004080;margin-bottom:5px}
-                .voucher-day-label{font-size:18px;font-weight:bold;margin-top:10px}
-                .voucher-info-small{font-size:10px;color:#666;margin-top:5px}
-                @media print{.voucher-card{page-break-inside:avoid}}</style></head>
-                <body><div class="vouchers-grid">${printContent}</div></body></html>`);
-            printWindow.document.close();
-            printWindow.print();
+            window.print();
+        }
+
+        async function downloadVoucherPDF() {
+            const patientId = document.getElementById('voucherPatientId').textContent;
+            
+            showNotification('Generating PDF...', 'info');
+            
+            try {
+                const voucherPage = document.getElementById('voucherPage');
+                
+                // Capture the voucher page as canvas
+                const canvas = await html2canvas(voucherPage, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Create PDF with jsPDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // Calculate dimensions to fit A4 landscape
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const imgWidth = canvas.width;
+                const imgHeight = canvas.height;
+                
+                const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                const imgX = (pdfWidth - imgWidth * ratio) / 2;
+                const imgY = 5;
+                
+                pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                
+                // Save PDF
+                pdf.save(`TES_Voucher_${patientId}.pdf`);
+                
+                showNotification('PDF downloaded successfully!', 'success');
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                showNotification('Error generating PDF. Try printing instead.', 'error');
+            }
+        }
+
+        // Legacy function for compatibility
+        function downloadVoucher() {
+            downloadVoucherPDF();
+        }
+        
+        function printVoucher() {
+            printVouchers();
         }
 
         // ============================================
