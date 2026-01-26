@@ -1256,6 +1256,19 @@
         .patient-status { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; }
         .patient-status.active { background: #28a745; color: #ffffff; }
         .patient-status.completed { background: #17a2b8; color: #ffffff; }
+        .patient-status.withdrawn { background: #dc3545; color: #ffffff; }
+        .patient-card.withdrawn-card { border-color: #dc3545; background: #fff5f5; }
+        .withdrawal-notice { 
+            background: #f8d7da; 
+            color: #721c24; 
+            padding: 8px 12px; 
+            border-radius: 4px; 
+            margin-bottom: 10px; 
+            font-size: 12px;
+            border-left: 4px solid #dc3545;
+        }
+        .day-badge.blocked { background: #dc3545; color: #ffffff; }
+        .patient-action-btn.disabled { background: #6c757d; cursor: not-allowed; opacity: 0.6; }
         .patient-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; font-size: 12px; }
         .patient-info-item { display: flex; flex-direction: column; }
         .patient-info-label { color: #666; font-size: 10px; }
@@ -2504,6 +2517,10 @@
         function generateField(field) {
             // Add data attributes for conditional visibility
             let showIfAttr = '';
+            // Don't add required for fields with showIf - they start hidden
+            const isConditional = !!field.showIf;
+            const shouldBeRequired = field.required && !isConditional;
+            
             if (field.showIf) {
                 showIfAttr = `data-show-if-field="${field.showIf.field}" data-show-if-value="${field.showIf.value}" style="display: none;"`;
             }
@@ -2519,7 +2536,7 @@
                 html += '<div class="checkbox-group">';
                 field.options.forEach((option, idx) => {
                     html += `<div class="checkbox-item">
-                        <input type="radio" name="${field.name}" id="${field.name}_${idx}" value="${option}" ${field.required ? 'required' : ''}>
+                        <input type="radio" name="${field.name}" id="${field.name}_${idx}" value="${option}" ${shouldBeRequired ? 'required' : ''}>
                         <label for="${field.name}_${idx}">${option}</label>
                     </div>`;
                 });
@@ -2528,7 +2545,7 @@
                 html += '<div class="checkbox-group">';
                 field.options.forEach((option, idx) => {
                     html += `<div class="checkbox-item">
-                        <input type="checkbox" name="${field.name}" id="${field.name}_${idx}" value="${option}" ${field.required && field.options.length === 1 ? 'required' : ''}>
+                        <input type="checkbox" name="${field.name}" id="${field.name}_${idx}" value="${option}" ${shouldBeRequired && field.options.length === 1 ? 'required' : ''}>
                         <label for="${field.name}_${idx}">${option}</label>
                     </div>`;
                 });
@@ -2541,7 +2558,7 @@
             } else if (field.type === 'select') {
                 // Handle different select options
                 const selectId = field.name === 'study_medicine' ? 'id="study_medicine_select"' : '';
-                html += `<select class="form-select" name="${field.name}" ${selectId} ${field.required ? 'required' : ''}>`;
+                html += `<select class="form-select" name="${field.name}" ${selectId} ${shouldBeRequired ? 'required' : ''}>`;
                 field.options.forEach(opt => {
                     if (opt.startsWith('--')) {
                         html += `<option value="">${opt}</option>`;
@@ -2551,16 +2568,16 @@
                 });
                 html += '</select>';
             } else if (field.type === 'cascade_province') {
-                html += `<select class="form-select" name="${field.name}" id="cascade_province" onchange="updateDistrictDropdown()" ${field.required ? 'required' : ''}>
+                html += `<select class="form-select" name="${field.name}" id="cascade_province" onchange="updateDistrictDropdown()" ${shouldBeRequired ? 'required' : ''}>
                     <option value="">Select Province...</option>
                     ${getProvinces().map(p => `<option value="${p}">${p}</option>`).join('')}
                 </select>`;
             } else if (field.type === 'cascade_district') {
-                html += `<select class="form-select" name="${field.name}" id="cascade_district" onchange="updateHealthFacilityDropdown()" ${field.required ? 'required' : ''} disabled>
+                html += `<select class="form-select" name="${field.name}" id="cascade_district" onchange="updateHealthFacilityDropdown()" ${shouldBeRequired ? 'required' : ''} disabled>
                     <option value="">Select District...</option>
                 </select>`;
             } else if (field.type === 'cascade_hf') {
-                html += `<select class="form-select" name="${field.name}" id="cascade_hf" ${field.required ? 'required' : ''} disabled>
+                html += `<select class="form-select" name="${field.name}" id="cascade_hf" ${shouldBeRequired ? 'required' : ''} disabled>
                     <option value="">Select Health Facility...</option>
                 </select>`;
             } else if (field.type === 'signature') {
@@ -2573,35 +2590,35 @@
                         <span class="signature-label">Draw your signature above</span>
                         <button type="button" class="signature-clear-btn" onclick="clearSignature('${field.name}')">CLEAR</button>
                     </div>
-                    <input type="hidden" name="${field.name}" id="sigData_${field.name}" class="signature-input" ${field.required ? 'required' : ''}>
+                    <input type="hidden" name="${field.name}" id="sigData_${field.name}" class="signature-input" ${shouldBeRequired ? 'required' : ''}>
                 </div>`;
             } else if (field.type === 'textarea') {
-                html += `<textarea class="form-textarea" name="${field.name}" rows="3" ${field.required ? 'required' : ''}></textarea>`;
+                html += `<textarea class="form-textarea" name="${field.name}" rows="3" ${shouldBeRequired ? 'required' : ''}></textarea>`;
             } else if (field.type === 'date') {
                 // Special handling for date_of_birth to auto-calculate age
                 if (field.name === 'date_of_birth') {
-                    html += `<input type="date" class="form-input" name="${field.name}" onchange="autoCalculateAge(this.value)" ${field.required ? 'required' : ''}>`;
+                    html += `<input type="date" class="form-input" name="${field.name}" onchange="autoCalculateAge(this.value)" ${shouldBeRequired ? 'required' : ''}>`;
                 } else {
-                    html += `<input type="date" class="form-input" name="${field.name}" ${field.required ? 'required' : ''}>`;
+                    html += `<input type="date" class="form-input" name="${field.name}" ${shouldBeRequired ? 'required' : ''}>`;
                 }
             } else if (field.type === 'time') {
                 // Special handling for dose1_time to auto-calculate dose2_time
                 if (field.name === 'dose1_time') {
-                    html += `<input type="time" class="form-input" name="${field.name}" id="dose1_time_input" onchange="calculateDose2Time(this.value)" ${field.required ? 'required' : ''}>`;
+                    html += `<input type="time" class="form-input" name="${field.name}" id="dose1_time_input" onchange="calculateDose2Time(this.value)" ${shouldBeRequired ? 'required' : ''}>`;
                 } else if (field.name === 'dose2_time' && field.autoCalculate8hrs) {
-                    html += `<input type="time" class="form-input" name="${field.name}" id="dose2_time_input" ${field.required ? 'required' : ''}>`;
+                    html += `<input type="time" class="form-input" name="${field.name}" id="dose2_time_input" ${shouldBeRequired ? 'required' : ''}>`;
                 } else {
-                    html += `<input type="time" class="form-input" name="${field.name}" ${field.required ? 'required' : ''}>`;
+                    html += `<input type="time" class="form-input" name="${field.name}" ${shouldBeRequired ? 'required' : ''}>`;
                 }
             } else if (field.type === 'number') {
                 // Special handling for age fields to update display
                 if (field.name === 'estimated_age_years' || field.name === 'estimated_age_months') {
-                    html += `<input type="number" class="form-input" name="${field.name}" min="0" oninput="updateAgeDisplay()" ${field.required ? 'required' : ''}>`;
+                    html += `<input type="number" class="form-input" name="${field.name}" min="0" oninput="updateAgeDisplay()" ${shouldBeRequired ? 'required' : ''}>`;
                 } else {
-                    html += `<input type="number" class="form-input" name="${field.name}" step="any" ${field.required ? 'required' : ''}>`;
+                    html += `<input type="number" class="form-input" name="${field.name}" step="any" ${shouldBeRequired ? 'required' : ''}>`;
                 }
             } else if (field.type === 'tel') {
-                html += `<input type="tel" class="form-input" name="${field.name}" pattern="[0-9]{9}" maxlength="9" minlength="9" placeholder="e.g. 099725620" title="Phone number must be exactly 9 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)" ${field.required ? 'required' : ''}>`;
+                html += `<input type="tel" class="form-input" name="${field.name}" pattern="[0-9]{9}" maxlength="9" minlength="9" placeholder="e.g. 099725620" title="Phone number must be exactly 9 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)" ${shouldBeRequired ? 'required' : ''}>`;
             } else {
                 const defaultVal = field.defaultValue ? `value="${field.defaultValue}"` : '';
                 const readonlyAttr = field.readonly ? 'readonly style="background: #e9ecef; cursor: not-allowed;"' : '';
@@ -2610,7 +2627,7 @@
                 if (field.name === 'antimalarial_dose1_name' || field.name === 'antimalarial_dose2_name') {
                     extraId = `id="${field.name}_input"`;
                 }
-                html += `<input type="text" class="form-input" name="${field.name}" ${extraId} ${defaultVal} ${readonlyAttr} ${field.required ? 'required' : ''}>`;
+                html += `<input type="text" class="form-input" name="${field.name}" ${extraId} ${defaultVal} ${readonlyAttr} ${shouldBeRequired ? 'required' : ''}>`;
             }
             
             html += '</div>';
@@ -2777,7 +2794,7 @@
             });
             
             // Initial check
-            handleConditionalVisibility();
+            setTimeout(handleConditionalVisibility, 100);
         }
         
         function handleConditionalVisibility() {
@@ -2801,20 +2818,17 @@
                 // Show or hide based on condition
                 if (currentValue === triggerValue) {
                     formGroup.style.display = 'block';
-                    // Make inputs required if they were originally required
-                    formGroup.querySelectorAll('input, select, textarea').forEach(inp => {
-                        if (inp.dataset.wasRequired === 'true') {
-                            inp.required = true;
-                        }
-                    });
+                    formGroup.dataset.hidden = 'false';
                 } else {
                     formGroup.style.display = 'none';
-                    // Remove required attribute when hidden
+                    formGroup.dataset.hidden = 'true';
+                    // Clear values when hidden
                     formGroup.querySelectorAll('input, select, textarea').forEach(inp => {
-                        if (inp.required) {
-                            inp.dataset.wasRequired = 'true';
+                        if (inp.type === 'checkbox' || inp.type === 'radio') {
+                            inp.checked = false;
+                        } else {
+                            inp.value = '';
                         }
-                        inp.required = false;
                     });
                 }
             });
@@ -3330,6 +3344,16 @@
         // ============================================
         async function handleFormSubmit(e) {
             e.preventDefault();
+            
+            // Remove required from hidden fields before validation
+            document.querySelectorAll('[data-show-if-field]').forEach(formGroup => {
+                if (formGroup.style.display === 'none') {
+                    formGroup.querySelectorAll('input, select, textarea').forEach(inp => {
+                        inp.required = false;
+                    });
+                }
+            });
+            
             const formData = new FormData(e.target);
             const patientId = document.getElementById('patient_id').value;
             const day = parseInt(document.getElementById('follow_up_day').value);
@@ -3366,15 +3390,19 @@
                 form_type: state.currentMode
             };
             
-            // Collect all form data including checkbox groups
+            // Collect all form data including checkbox groups and radio groups
             const checkboxGroups = {};
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
-                if (!checkboxGroups[cb.name]) checkboxGroups[cb.name] = [];
-                checkboxGroups[cb.name].push(cb.value);
+            document.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked').forEach(cb => {
+                if (cb.type === 'radio') {
+                    data[cb.name] = cb.value;
+                } else {
+                    if (!checkboxGroups[cb.name]) checkboxGroups[cb.name] = [];
+                    checkboxGroups[cb.name].push(cb.value);
+                }
             });
             
             for (const [key, value] of formData.entries()) {
-                if (!checkboxGroups[key]) data[key] = value;
+                if (!checkboxGroups[key] && !data[key]) data[key] = value;
             }
             for (const [key, values] of Object.entries(checkboxGroups)) {
                 data[key] = values.join(', ');
@@ -3384,6 +3412,32 @@
             if (state.currentMode === 'screening') {
                 data.is_eligible = isEligible ? 'Yes' : 'No';
                 data.eligibility_reason = eligibilityReason;
+            }
+            
+            // Check withdrawal conditions for follow-up (not screening)
+            let shouldWithdraw = false;
+            let withdrawalReason = '';
+            
+            if (state.currentMode !== 'screening' && state.patients[patientId]) {
+                // Check for conditions that require withdrawal
+                if (data.danger_signs_present === 'Yes') {
+                    shouldWithdraw = true;
+                    withdrawalReason = 'Danger signs or severe malaria present';
+                }
+                if (data.other_species_present === 'Yes') {
+                    shouldWithdraw = true;
+                    withdrawalReason = 'Other Plasmodium species detected';
+                }
+                if (data.serious_adverse_event === 'Yes') {
+                    shouldWithdraw = true;
+                    withdrawalReason = 'Serious adverse event';
+                }
+                
+                if (shouldWithdraw) {
+                    data.patient_withdrawn = 'Yes';
+                    data.withdrawal_reason = withdrawalReason;
+                    data.withdrawal_day = day;
+                }
             }
 
             state.submissions[submissionKey] = data;
@@ -3407,12 +3461,22 @@
                     weight: data.weight_kg,
                     screeningTemperature: data.temperature,
                     isEligible: true,
+                    isWithdrawn: false,
+                    withdrawalReason: '',
+                    withdrawalDay: null,
                     completedDays: []
                 };
             } else if (state.currentMode !== 'screening' && state.patients[patientId]) {
                 if (!state.patients[patientId].completedDays.includes(day)) {
                     state.patients[patientId].completedDays.push(day);
                     state.patients[patientId].completedDays.sort((a, b) => a - b);
+                }
+                
+                // Mark patient as withdrawn if conditions met
+                if (shouldWithdraw) {
+                    state.patients[patientId].isWithdrawn = true;
+                    state.patients[patientId].withdrawalReason = withdrawalReason;
+                    state.patients[patientId].withdrawalDay = day;
                 }
                 
                 // Store medicine selection from Day 0
@@ -3439,6 +3503,9 @@
                 showVouchers(patientId, data);
             } else if (state.currentMode === 'screening' && !isEligible) {
                 showNotification(`Patient is NOT ELIGIBLE. Reason: ${eligibilityReason || 'Criteria not met'}`, 'warning');
+                resetForm();
+            } else if (shouldWithdraw) {
+                showNotification(`⛔ PATIENT IS NOW OUT OF STUDY. Reason: ${withdrawalReason}. Day ${day} data saved. No further follow-up allowed.`, 'warning');
                 resetForm();
             } else {
                 showNotification(`Day ${day} data submitted successfully!`, 'success');
@@ -3741,6 +3808,12 @@
             const patient = state.patients[patientId];
             if (!patient) { showNotification('Patient not found', 'error'); return; }
             
+            // Check if patient is withdrawn
+            if (patient.isWithdrawn) {
+                showNotification(`⛔ PATIENT IS OUT OF STUDY (Withdrawn Day ${patient.withdrawalDay}). Reason: ${patient.withdrawalReason}. No further follow-up allowed.`, 'error');
+                return;
+            }
+            
             state.selectedPatientId = patientId;
             state.currentMode = 'followup';
             
@@ -3765,6 +3838,7 @@
         function updateDayButtons(patient) {
             const container = document.getElementById('dayButtons');
             const completedDays = patient.completedDays || [];
+            const isWithdrawn = patient.isWithdrawn || false;
             
             // Get follow-up days based on patient's medicine (if selected)
             let followUpDays = CONFIG.FOLLOW_UP_DAYS; // Default all days
@@ -3783,10 +3857,22 @@
                 
                 let className = 'day-btn';
                 let disabled = '';
-                if (isCompleted) { className += ' completed'; disabled = 'disabled'; }
-                else if (isLocked) { className += ' locked'; disabled = 'disabled'; }
+                let label = `D${day}`;
                 
-                html += `<button type="button" class="${className}" data-day="${day}" ${disabled} onclick="selectDay(${day})">D${day}</button>`;
+                if (isCompleted) { 
+                    className += ' completed'; 
+                    disabled = 'disabled'; 
+                    label += '✓';
+                } else if (isWithdrawn) { 
+                    className += ' locked'; 
+                    disabled = 'disabled'; 
+                    label += '✗';
+                } else if (isLocked) { 
+                    className += ' locked'; 
+                    disabled = 'disabled'; 
+                }
+                
+                html += `<button type="button" class="${className}" data-day="${day}" ${disabled} onclick="selectDay(${day})">${label}</button>`;
             });
             container.innerHTML = html;
         }
@@ -3797,6 +3883,12 @@
             
             const patient = state.patients[patientId];
             const completedDays = patient.completedDays || [];
+            
+            // Check if patient is withdrawn
+            if (patient.isWithdrawn) {
+                showNotification(`⛔ PATIENT IS OUT OF STUDY (Withdrawn Day ${patient.withdrawalDay}). Reason: ${patient.withdrawalReason}. No further follow-up allowed.`, 'error');
+                return;
+            }
             
             // Get follow-up days based on patient's medicine
             let followUpDays = CONFIG.FOLLOW_UP_DAYS;
@@ -3918,31 +4010,57 @@
                 let html = '';
                 patientsList.forEach(patient => {
                     const completedDays = patient.completedDays || [];
-                    const allCompleted = completedDays.length === CONFIG.FOLLOW_UP_DAYS.length;
+                    const isWithdrawn = patient.isWithdrawn || false;
                     
-                    html += `<div class="patient-card">
+                    // Get follow-up days based on patient's medicine
+                    let followUpDays = CONFIG.FOLLOW_UP_DAYS;
+                    if (patient.studyMedicine && CONFIG.MEDICINES[patient.studyMedicine]) {
+                        followUpDays = CONFIG.MEDICINES[patient.studyMedicine].followUpDays;
+                    }
+                    
+                    const allCompleted = !isWithdrawn && completedDays.length === followUpDays.length;
+                    
+                    // Determine status
+                    let statusClass = 'active';
+                    let statusText = 'ACTIVE';
+                    if (isWithdrawn) {
+                        statusClass = 'withdrawn';
+                        statusText = '❌ OUT OF STUDY';
+                    } else if (allCompleted) {
+                        statusClass = 'completed';
+                        statusText = '✓ COMPLETED';
+                    }
+                    
+                    html += `<div class="patient-card ${isWithdrawn ? 'withdrawn-card' : ''}">
                         <div class="patient-card-header">
                             <span class="patient-id">${patient.patientId}</span>
-                            <span class="patient-status ${allCompleted ? 'completed' : 'active'}">${allCompleted ? 'COMPLETED' : 'ACTIVE'}</span>
+                            <span class="patient-status ${statusClass}">${statusText}</span>
                         </div>
+                        ${isWithdrawn ? `<div class="withdrawal-notice">
+                            <strong>Withdrawn on Day ${patient.withdrawalDay}:</strong> ${patient.withdrawalReason}
+                        </div>` : ''}
                         <div class="patient-info-grid">
                             <div class="patient-info-item"><span class="patient-info-label">NAME</span><span class="patient-info-value">${patient.patientName || '---'}</span></div>
                             <div class="patient-info-item"><span class="patient-info-label">AGE</span><span class="patient-info-value">${patient.ageDisplay || `${patient.ageYears || 0}y ${patient.ageMonths || 0}m`}</span></div>
                             <div class="patient-info-item"><span class="patient-info-label">HEALTH CENTRE</span><span class="patient-info-value">${patient.healthCentre || '---'}</span></div>
-                            <div class="patient-info-item"><span class="patient-info-label">SCREENED</span><span class="patient-info-value">${patient.screeningDate || '---'}</span></div>
+                            <div class="patient-info-item"><span class="patient-info-label">MEDICINE</span><span class="patient-info-value">${patient.studyMedicine || 'Not assigned'}</span></div>
                         </div>
                         <div class="patient-days-progress">
-                            ${CONFIG.FOLLOW_UP_DAYS.map(day => {
+                            ${followUpDays.map(day => {
                                 const isCompleted = completedDays.includes(day);
-                                const dayIndex = CONFIG.FOLLOW_UP_DAYS.indexOf(day);
-                                const previousDay = dayIndex > 0 ? CONFIG.FOLLOW_UP_DAYS[dayIndex - 1] : null;
+                                const dayIndex = followUpDays.indexOf(day);
+                                const previousDay = dayIndex > 0 ? followUpDays[dayIndex - 1] : null;
                                 const isPreviousCompleted = previousDay === null || completedDays.includes(previousDay);
-                                const isPending = !isCompleted && isPreviousCompleted;
-                                return `<span class="day-badge ${isCompleted ? 'completed' : isPending ? 'pending' : 'locked'}">D${day}${isCompleted ? '✓' : ''}</span>`;
+                                const isPending = !isCompleted && isPreviousCompleted && !isWithdrawn;
+                                const isBlocked = isWithdrawn && !isCompleted;
+                                return `<span class="day-badge ${isCompleted ? 'completed' : isBlocked ? 'blocked' : isPending ? 'pending' : 'locked'}">D${day}${isCompleted ? '✓' : isBlocked ? '✗' : ''}</span>`;
                             }).join('')}
                         </div>
                         <div class="patient-actions">
-                            <button class="patient-action-btn followup" onclick="closePatientsModal(); selectPatientForFollowup('${patient.patientId}')">FOLLOW-UP</button>
+                            ${isWithdrawn ? 
+                                `<button class="patient-action-btn disabled" disabled>OUT OF STUDY</button>` :
+                                `<button class="patient-action-btn followup" onclick="closePatientsModal(); selectPatientForFollowup('${patient.patientId}')">FOLLOW-UP</button>`
+                            }
                             <button class="patient-action-btn voucher" onclick="showVouchersFromList('${patient.patientId}')">VOUCHERS</button>
                         </div>
                     </div>`;
