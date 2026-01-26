@@ -1450,12 +1450,12 @@
 
             <div class="controls-bar">
                 <button class="control-btn new-btn" onclick="startNewScreening()">+ NEW SCREENING</button>
-                <button class="control-btn scan-btn" onclick="startCaseReportForm()">CASE REPORT FORM</button>
+                <button class="control-btn scan-btn" onclick="startCaseReportForm()">📱 FOLLOW-UP (SCAN)</button>
                 <button class="control-btn" onclick="openPatientsModal()">PATIENTS (<span id="patientCountBadge">0</span>)</button>
                 <button class="control-btn view-data-btn" onclick="openViewDataModal()">VIEW DATA</button>
                 <button class="control-btn dashboard-btn" onclick="openDashboard()">DASHBOARD</button>
                 <button class="control-btn dhis2-btn" onclick="openDhis2Modal()">DHIS2 SYNC</button>
-                <button class="control-btn" id="logoutBtn" onclick="handleLogout()">LOGOUT</button>>LOGOUT</button>
+                <button class="control-btn" id="logoutBtn" onclick="handleLogout()">LOGOUT</button>
             </div>
 
             <div class="status-bar">
@@ -1481,9 +1481,9 @@
 
             <!-- Scan Voucher Panel (shown when Case Report Form selected) -->
             <div class="scan-panel" id="scanPanel" style="display: none;">
-                <div class="scan-panel-title">CASE REPORT FORM</div>
-                <p class="scan-panel-desc">Scan the patient's voucher to continue with follow-up</p>
-                <button class="scan-voucher-btn" onclick="openScannerModal()">SCAN VOUCHER</button>
+                <div class="scan-panel-title">📱 SCAN VOUCHER FOR FOLLOW-UP</div>
+                <p class="scan-panel-desc">Patient must present their voucher. Scan the QR code to proceed with follow-up visit.</p>
+                <button class="scan-voucher-btn" onclick="openScannerModal()">📷 SCAN VOUCHER QR CODE</button>
             </div>
 
             <div class="day-selector" id="daySelector">
@@ -2376,7 +2376,7 @@
             document.getElementById('modeIndicator').style.display = 'none';
             
             state.currentMode = 'followup';
-            showNotification('Scan patient voucher to continue', 'info');
+            showNotification('📱 Scan patient voucher QR code to proceed with follow-up', 'info');
             window.scrollTo({ top: document.getElementById('scanPanel').offsetTop - 20, behavior: 'smooth' });
         }
 
@@ -3791,10 +3791,10 @@
                     showNotification('Patient not found in local database', 'error');
                     return;
                 }
-                selectPatientForFollowup(patientId, scannedDay);
+                selectPatientForFollowup(patientId, scannedDay, true); // true = from QR scan
             } catch (e) {
                 if (state.patients[decodedText]) {
-                    selectPatientForFollowup(decodedText);
+                    selectPatientForFollowup(decodedText, null, true); // true = from QR scan
                 } else {
                     showNotification('Invalid QR code or patient not found', 'error');
                 }
@@ -3804,9 +3804,16 @@
         // ============================================
         // FOLLOW-UP
         // ============================================
-        function selectPatientForFollowup(patientId, preferredDay = null) {
+        function selectPatientForFollowup(patientId, preferredDay = null, fromQRScan = false) {
             const patient = state.patients[patientId];
             if (!patient) { showNotification('Patient not found', 'error'); return; }
+            
+            // Require QR scan for follow-up visits
+            if (!fromQRScan) {
+                showNotification('📱 Please SCAN the patient voucher QR code to proceed with follow-up visit.', 'warning');
+                openScannerModal();
+                return;
+            }
             
             // Check if patient is withdrawn
             if (patient.isWithdrawn) {
@@ -4059,7 +4066,7 @@
                         <div class="patient-actions">
                             ${isWithdrawn ? 
                                 `<button class="patient-action-btn disabled" disabled>OUT OF STUDY</button>` :
-                                `<button class="patient-action-btn followup" onclick="closePatientsModal(); selectPatientForFollowup('${patient.patientId}')">FOLLOW-UP</button>`
+                                `<button class="patient-action-btn followup" onclick="closePatientsModal(); openScannerModal()">📱 SCAN VOUCHER</button>`
                             }
                             <button class="patient-action-btn voucher" onclick="showVouchersFromList('${patient.patientId}')">VOUCHERS</button>
                         </div>
