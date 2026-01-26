@@ -764,7 +764,10 @@
             border-radius: 4px;
             font-size: 12px;
             border-left: 4px solid #dee2e6;
+            gap: 8px;
         }
+        .criteria-item span:first-child { flex: 2; }
+        .criteria-value { flex: 1; font-size: 11px; color: #666; text-align: center; font-style: italic; }
         .criteria-item.met { border-left-color: #28a745; }
         .criteria-item.not-met { border-left-color: #dc3545; }
         .criteria-item.pending { border-left-color: #ffc107; }
@@ -773,6 +776,7 @@
             padding: 2px 8px;
             border-radius: 4px;
             font-size: 11px;
+            white-space: nowrap;
         }
         .criteria-status.yes { background: #28a745; color: #ffffff; }
         .criteria-status.no { background: #dc3545; color: #ffffff; }
@@ -1972,8 +1976,8 @@
                     { name: 'province', label: 'Province', type: 'cascade_province', required: true },
                     { name: 'district', label: 'District', type: 'cascade_district', required: true },
                     { name: 'health_centre_name', label: 'Health Facility Name', type: 'cascade_hf', required: true },
-                    { name: 'patient_screening_number', label: 'Patient screening number', type: 'text', required: true },
-                    { name: 'patient_name', label: 'Patient name', type: 'text', required: true },
+                    { name: 'patient_screening_number', label: 'Patient screening number', type: 'text', required: true, readonly: true, autoGenerate: true },
+                    { name: 'patient_name', label: 'Patient name', type: 'text', required: true, linkFrom: 'consent_child_name' },
                     { name: 'date_of_visit', label: 'Date of visit (dd-mmm-yyyy)', type: 'date', required: true },
                     { name: 'tel', label: 'Tel', type: 'tel', required: false },
                     { name: 'address_landmark', label: 'Address/Landmark', type: 'textarea', required: false }
@@ -1988,7 +1992,7 @@
                     { name: 'estimated_age_months', label: 'Estimated age - Months', type: 'number', required: false },
                     { name: 'age_display', label: 'Age (auto-calculated)', type: 'text', required: false, readonly: true },
                     { name: 'weight_kg', label: 'Weight (kg)', type: 'number', required: true },
-                    { name: 'sex', label: 'Sex', type: 'checkbox_group', options: ['Male', 'Female'], required: true }
+                    { name: 'sex', label: 'Sex', type: 'radio_group', options: ['Male', 'Female'], required: true }
                 ]
             },
             {
@@ -2013,35 +2017,23 @@
                 ]
             },
             {
-                title: 'Inclusion Criteria Assessment',
-                description: 'Assess each inclusion criterion - ALL must be YES for eligibility',
+                title: 'Clinical Assessment',
+                description: 'Additional clinical questions for eligibility',
                 fields: [
-                    { name: 'ic_age', label: 'Age between 6 months to 59 months?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_mono_infection', label: 'Mono-infection with P. falciparum detected by microscopy?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_parasitaemia', label: 'Parasitaemia of 2,000 – 200,000/µl asexual forms?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_fever', label: 'Temperature ≥37.5°C or history of fever within the last 24 hours?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_oral_meds', label: 'Ability to swallow oral medication?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_comply', label: 'Ability and willingness to comply with study protocol?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_consent', label: 'Informed consent from parent/guardian obtained?', type: 'radio_group', options: ['Yes', 'No'], required: true }
+                    { name: 'danger_signs_present', label: 'Presence of general danger signs or signs of severe malaria?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'able_to_swallow', label: 'Is the patient able to swallow oral medication?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'willing_to_comply', label: 'Is caregiver willing to comply with study protocol for follow-up visits?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'severe_malnutrition', label: 'Does patient have severe malnutrition (MUAC <110mm)?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'other_febrile_conditions', label: 'Other febrile conditions (measles, acute LRTI, severe diarrhea) or chronic diseases?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'interfering_medications', label: 'Regular medication which may interfere with antimalarial pharmacokinetics?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'hypersensitivity_history', label: 'History of hypersensitivity reactions to test medicines?', type: 'radio_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
-                title: 'Exclusion Criteria Assessment',
-                description: 'Assess each exclusion criterion - ANY YES means NOT eligible',
-                fields: [
-                    { name: 'ec_danger_signs', label: 'Presence of general danger signs or signs of severe falciparum malaria?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_weight_under_5kg', label: 'Weight under 5 kg?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_mixed_infection', label: 'Mixed or mono-infection with another Plasmodium species detected by microscopy?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_malnutrition', label: 'Severe malnutrition (MUAC <110mm)?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_other_febrile', label: 'Other febrile conditions (measles, acute LRTI, severe diarrhea) or known chronic/severe diseases?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_interfering_meds', label: 'Regular medication which may interfere with antimalarial pharmacokinetics?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_hypersensitivity', label: 'History of hypersensitivity reactions or contraindications to test medicines?', type: 'radio_group', options: ['Yes', 'No'], required: true }
-                ]
-            },
-            {
-                title: 'Eligibility Summary',
-                description: 'Auto-calculated eligibility based on criteria above',
+                title: 'Eligibility Summary (Auto-Calculated)',
+                description: 'Eligibility is automatically determined based on your responses above',
                 isEligibilitySummary: true,
+                isAutoCalculated: true,
                 fields: []
             },
             {
@@ -2352,7 +2344,9 @@
             document.getElementById('follow_up_day').value = '-1';
             state.selectedDay = -1;
             state.selectedPatientId = null;
-            generatePatientId();
+            // Patient ID will be set from patient_identity_number field during submission
+            document.getElementById('patient_id').value = '';
+            
             // Combine Consent + Screening sections
             const allScreeningSections = [...CONSENT_SECTIONS, ...SCREENING_SECTIONS];
             generateFormSections(allScreeningSections);
@@ -2392,14 +2386,6 @@
             startCaseReportForm();
         }
 
-        function generatePatientId() {
-            const timestamp = Date.now().toString(36).toUpperCase();
-            const random = Math.random().toString(36).substr(2, 4).toUpperCase();
-            const patientId = `TES-${timestamp}-${random}`;
-            document.getElementById('patient_id').value = patientId;
-            return patientId;
-        }
-
         // ============================================
         // FORM GENERATION
         // ============================================
@@ -2428,38 +2414,38 @@
                 if (section.isEligibilitySummary) {
                     html += `<div class="eligibility-summary" id="eligibilitySummary">
                         <div class="eligibility-result pending" id="eligibilityResult">
-                            ⏳ CALCULATING ELIGIBILITY...
+                            ⏳ ELIGIBILITY WILL BE AUTO-CALCULATED FROM YOUR RESPONSES
                         </div>
                         
                         <div class="criteria-summary-section">
-                            <div class="criteria-summary-title inclusion">✓ INCLUSION CRITERIA (All must be YES)</div>
+                            <div class="criteria-summary-title inclusion">✓ INCLUSION CRITERIA (Auto-calculated - All must be MET)</div>
                             <div id="inclusionSummaryItems">
-                                <div class="criteria-item pending"><span>Age 6-59 months</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Mono-infection P. falciparum</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Parasitaemia 2,000-200,000/µl</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Fever ≥37.5°C or history</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Ability to swallow oral meds</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Willingness to comply</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Informed consent obtained</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Age 6-59 months</span><span class="criteria-value">Enter age above</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Mono-infection P. falciparum</span><span class="criteria-value">Select species</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Parasitaemia 2,000-200,000/µl</span><span class="criteria-value">Enter count</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Fever ≥37.5°C or history</span><span class="criteria-value">Enter temp</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Able to swallow oral meds</span><span class="criteria-value">Answer above</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Willing to comply</span><span class="criteria-value">Answer above</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Informed consent obtained</span><span class="criteria-value">Sign consent</span><span class="criteria-status pending">--</span></div>
                             </div>
                         </div>
                         
                         <div class="criteria-summary-section">
-                            <div class="criteria-summary-title exclusion">✗ EXCLUSION CRITERIA (All must be NO)</div>
+                            <div class="criteria-summary-title exclusion">✗ EXCLUSION CRITERIA (Auto-calculated - All must be CLEAR)</div>
                             <div id="exclusionSummaryItems">
-                                <div class="criteria-item pending"><span>Danger signs/severe malaria</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Weight under 5 kg</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Mixed Plasmodium infection</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Severe malnutrition</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Other febrile/chronic conditions</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Interfering medications</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Hypersensitivity to medicines</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Danger signs/severe malaria</span><span class="criteria-value">Answer above</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Weight under 5 kg</span><span class="criteria-value">Enter weight</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Mixed Plasmodium infection</span><span class="criteria-value">Select species</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Severe malnutrition</span><span class="criteria-value">Answer above</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Other febrile/chronic conditions</span><span class="criteria-value">Answer above</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Interfering medications</span><span class="criteria-value">Answer above</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Hypersensitivity to medicines</span><span class="criteria-value">Answer above</span><span class="criteria-status pending">--</span></div>
                             </div>
                         </div>
                         
                         <div class="eligibility-note-box">
-                            <strong>Note:</strong> Eligibility is automatically calculated based on your responses in the Inclusion and Exclusion Criteria sections.
-                            The patient must meet ALL inclusion criteria (Yes) and NONE of the exclusion criteria (all No) to be eligible.
+                            <strong>📊 Auto-Calculation:</strong> Eligibility is automatically determined from your responses in previous sections.
+                            No need to manually assess each criterion - the system calculates based on age, weight, temperature, species, parasite count, and clinical assessment answers.
                         </div>
                     </div>
                     <input type="hidden" name="is_eligible" id="is_eligible_field" value="">
@@ -2751,7 +2737,7 @@
         // ============================================
         // AUTO ID GENERATION
         // ============================================
-        function generateScreeningId() {
+        function generateScreeningId(patientName = '') {
             const date = new Date();
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -2759,7 +2745,55 @@
             const hours = String(date.getHours()).padStart(2, '0');
             const mins = String(date.getMinutes()).padStart(2, '0');
             const secs = String(date.getSeconds()).padStart(2, '0');
+            
+            // Get initials from patient name
+            const initials = getInitials(patientName);
+            
+            if (initials) {
+                return `TES-${year}${month}${day}-${hours}${mins}${secs}_${initials}`;
+            }
             return `TES-${year}${month}${day}-${hours}${mins}${secs}`;
+        }
+        
+        function getInitials(name) {
+            if (!name || name.trim() === '') return '';
+            const words = name.trim().split(/\s+/);
+            let initials = '';
+            words.forEach(word => {
+                if (word.length > 0) {
+                    initials += word.charAt(0).toUpperCase();
+                }
+            });
+            return initials.substring(0, 4); // Max 4 initials
+        }
+        
+        function updateScreeningIdWithInitials() {
+            const patientNameField = document.querySelector('input[name="patient_name"]');
+            const childNameField = document.querySelector('input[name="consent_child_name"]');
+            const screeningIdField = document.querySelector('input[name="patient_identity_number"]');
+            const patientScreeningField = document.querySelector('input[name="patient_screening_number"]');
+            
+            const name = patientNameField?.value || childNameField?.value || '';
+            
+            if (screeningIdField) {
+                // Extract base ID (remove old initials if present)
+                let baseId = screeningIdField.value.split('_')[0];
+                if (!baseId.startsWith('TES-')) {
+                    baseId = generateScreeningId().split('_')[0];
+                }
+                const initials = getInitials(name);
+                screeningIdField.value = initials ? `${baseId}_${initials}` : baseId;
+            }
+            
+            if (patientScreeningField) {
+                // Extract base ID (remove old initials if present)
+                let baseId = patientScreeningField.value.split('_')[0];
+                if (!baseId.startsWith('TES-')) {
+                    baseId = generateScreeningId().split('_')[0];
+                }
+                const initials = getInitials(name);
+                patientScreeningField.value = initials ? `${baseId}_${initials}` : baseId;
+            }
         }
         
         function generatePatientId(healthFacility) {
@@ -2781,7 +2815,61 @@
                 screeningIdField.style.cursor = 'not-allowed';
             }
             
-            // Patient ID is generated when patient is selected or form submitted
+            // Auto-fill patient screening number
+            const patientScreeningField = document.querySelector('input[name="patient_screening_number"]');
+            if (patientScreeningField && !patientScreeningField.value) {
+                patientScreeningField.value = generateScreeningId();
+                patientScreeningField.readOnly = true;
+                patientScreeningField.style.backgroundColor = '#e9ecef';
+                patientScreeningField.style.cursor = 'not-allowed';
+            }
+            
+            // Link consent_child_name to patient_name and update IDs with initials
+            const childNameField = document.querySelector('input[name="consent_child_name"]');
+            const patientNameField = document.querySelector('input[name="patient_name"]');
+            
+            if (childNameField && patientNameField) {
+                // If child name already filled, copy to patient name
+                if (childNameField.value && !patientNameField.value) {
+                    patientNameField.value = childNameField.value;
+                    updateScreeningIdWithInitials();
+                }
+                
+                // Set up listener to auto-copy and update IDs
+                childNameField.addEventListener('input', function() {
+                    if (patientNameField) {
+                        patientNameField.value = this.value;
+                    }
+                    updateScreeningIdWithInitials();
+                });
+                
+                childNameField.addEventListener('change', function() {
+                    if (patientNameField) {
+                        patientNameField.value = this.value;
+                    }
+                    updateScreeningIdWithInitials();
+                });
+            }
+            
+            // Also link patient_name back to child_name if patient_name filled first
+            if (patientNameField && childNameField) {
+                patientNameField.addEventListener('input', function() {
+                    if (childNameField && !childNameField.value) {
+                        childNameField.value = this.value;
+                    }
+                    updateScreeningIdWithInitials();
+                });
+                
+                patientNameField.addEventListener('change', function() {
+                    updateScreeningIdWithInitials();
+                });
+            }
+            
+            // Auto-fill today's date for date_of_visit
+            const visitDateField = document.querySelector('input[name="date_of_visit"]');
+            if (visitDateField && !visitDateField.value) {
+                visitDateField.value = new Date().toISOString().split('T')[0];
+            }
         }
 
         // ============================================
@@ -2939,39 +3027,143 @@
         // ELIGIBILITY CALCULATOR
         // ============================================
         function setupEligibilityCalculator() {
-            // Inclusion criteria fields
-            const inclusionFields = ['ic_age', 'ic_mono_infection', 'ic_parasitaemia', 'ic_fever', 'ic_oral_meds', 'ic_comply', 'ic_consent'];
-            // Exclusion criteria fields
-            const exclusionFields = ['ec_danger_signs', 'ec_weight_under_5kg', 'ec_mixed_infection', 'ec_malnutrition', 'ec_other_febrile', 'ec_interfering_meds', 'ec_hypersensitivity'];
+            // Fields that affect eligibility calculation
+            const eligibilityFields = [
+                'estimated_age_years', 'estimated_age_months', 'weight_kg', 
+                'temperature', 'history_of_fever_24h',
+                'species', 'other_species_present', 'approx_parasite_count',
+                'danger_signs_present', 'able_to_swallow', 'willing_to_comply',
+                'severe_malnutrition', 'other_febrile_conditions', 
+                'interfering_medications', 'hypersensitivity_history',
+                'consent_form_signed'
+            ];
             
             // Add change listeners to all eligibility fields
-            [...inclusionFields, ...exclusionFields].forEach(fieldName => {
-                const checkboxes = document.querySelectorAll(`input[name="${fieldName}"]`);
-                checkboxes.forEach(cb => {
-                    cb.addEventListener('change', calculateEligibility);
+            eligibilityFields.forEach(fieldName => {
+                const inputs = document.querySelectorAll(`input[name="${fieldName}"], select[name="${fieldName}"]`);
+                inputs.forEach(input => {
+                    input.addEventListener('change', calculateEligibility);
+                    input.addEventListener('input', calculateEligibility);
                 });
             });
+            
+            // Initial calculation
+            setTimeout(calculateEligibility, 500);
         }
 
         function calculateEligibility() {
+            // Get form values
+            const ageYears = parseInt(document.querySelector('input[name="estimated_age_years"]')?.value) || 0;
+            const ageMonths = parseInt(document.querySelector('input[name="estimated_age_months"]')?.value) || 0;
+            const totalMonths = (ageYears * 12) + ageMonths;
+            
+            const weight = parseFloat(document.querySelector('input[name="weight_kg"]')?.value) || 0;
+            const temperature = parseFloat(document.querySelector('input[name="temperature"]')?.value) || 0;
+            const historyOfFever = getRadioValue('history_of_fever_24h');
+            
+            const speciesChecked = Array.from(document.querySelectorAll('input[name="species"]:checked')).map(cb => cb.value);
+            const otherSpeciesPresent = getRadioValue('other_species_present');
+            const parasiteCount = parseFloat(document.querySelector('input[name="approx_parasite_count"]')?.value) || 0;
+            
+            const dangerSigns = getRadioValue('danger_signs_present');
+            const ableToSwallow = getRadioValue('able_to_swallow');
+            const willingToComply = getRadioValue('willing_to_comply');
+            const severeMalnutrition = getRadioValue('severe_malnutrition');
+            const otherFebrile = getRadioValue('other_febrile_conditions');
+            const interferingMeds = getRadioValue('interfering_medications');
+            const hypersensitivity = getRadioValue('hypersensitivity_history');
+            const consentSigned = getRadioValue('consent_form_signed');
+            
+            // Auto-calculate inclusion criteria
             const inclusionCriteria = [
-                { field: 'ic_age', label: 'Age 6-59 months' },
-                { field: 'ic_mono_infection', label: 'Mono-infection P. falciparum' },
-                { field: 'ic_parasitaemia', label: 'Parasitaemia 2,000-200,000/µl' },
-                { field: 'ic_fever', label: 'Fever ≥37.5°C or history' },
-                { field: 'ic_oral_meds', label: 'Ability to swallow oral meds' },
-                { field: 'ic_comply', label: 'Willingness to comply' },
-                { field: 'ic_consent', label: 'Informed consent obtained' }
+                { 
+                    label: 'Age 6-59 months',
+                    met: totalMonths >= 6 && totalMonths <= 59,
+                    value: totalMonths > 0 ? `${totalMonths} months` : 'Not entered',
+                    filled: totalMonths > 0
+                },
+                { 
+                    label: 'Mono-infection with P. falciparum',
+                    met: speciesChecked.includes('P. falciparum') && speciesChecked.length === 1 && otherSpeciesPresent === 'No',
+                    value: speciesChecked.length > 0 ? speciesChecked.join(', ') : 'Not selected',
+                    filled: speciesChecked.length > 0 && otherSpeciesPresent !== null
+                },
+                { 
+                    label: 'Parasitaemia 2,000-200,000/µl',
+                    met: parasiteCount >= 2000 && parasiteCount <= 200000,
+                    value: parasiteCount > 0 ? parasiteCount.toLocaleString() + '/µl' : 'Not entered',
+                    filled: parasiteCount > 0
+                },
+                { 
+                    label: 'Fever ≥37.5°C or history of fever',
+                    met: temperature >= 37.5 || historyOfFever === 'Yes',
+                    value: temperature > 0 ? `${temperature}°C` : 'Not entered',
+                    filled: temperature > 0 || historyOfFever !== null
+                },
+                { 
+                    label: 'Able to swallow oral medication',
+                    met: ableToSwallow === 'Yes',
+                    value: ableToSwallow || 'Not answered',
+                    filled: ableToSwallow !== null
+                },
+                { 
+                    label: 'Willing to comply with protocol',
+                    met: willingToComply === 'Yes',
+                    value: willingToComply || 'Not answered',
+                    filled: willingToComply !== null
+                },
+                { 
+                    label: 'Informed consent obtained',
+                    met: consentSigned === 'Yes',
+                    value: consentSigned || 'Not answered',
+                    filled: consentSigned !== null
+                }
             ];
             
+            // Auto-calculate exclusion criteria
             const exclusionCriteria = [
-                { field: 'ec_danger_signs', label: 'Danger signs/severe malaria' },
-                { field: 'ec_weight_under_5kg', label: 'Weight under 5 kg' },
-                { field: 'ec_mixed_infection', label: 'Mixed Plasmodium infection' },
-                { field: 'ec_malnutrition', label: 'Severe malnutrition' },
-                { field: 'ec_other_febrile', label: 'Other febrile/chronic conditions' },
-                { field: 'ec_interfering_meds', label: 'Interfering medications' },
-                { field: 'ec_hypersensitivity', label: 'Hypersensitivity to medicines' }
+                { 
+                    label: 'Danger signs or severe malaria',
+                    met: dangerSigns === 'Yes',
+                    value: dangerSigns || 'Not answered',
+                    filled: dangerSigns !== null
+                },
+                { 
+                    label: 'Weight under 5 kg',
+                    met: weight > 0 && weight < 5,
+                    value: weight > 0 ? `${weight} kg` : 'Not entered',
+                    filled: weight > 0
+                },
+                { 
+                    label: 'Mixed Plasmodium infection',
+                    met: otherSpeciesPresent === 'Yes' || speciesChecked.length > 1,
+                    value: otherSpeciesPresent || 'Not answered',
+                    filled: otherSpeciesPresent !== null
+                },
+                { 
+                    label: 'Severe malnutrition',
+                    met: severeMalnutrition === 'Yes',
+                    value: severeMalnutrition || 'Not answered',
+                    filled: severeMalnutrition !== null
+                },
+                { 
+                    label: 'Other febrile/chronic conditions',
+                    met: otherFebrile === 'Yes',
+                    value: otherFebrile || 'Not answered',
+                    filled: otherFebrile !== null
+                },
+                { 
+                    label: 'Interfering medications',
+                    met: interferingMeds === 'Yes',
+                    value: interferingMeds || 'Not answered',
+                    filled: interferingMeds !== null
+                },
+                { 
+                    label: 'Hypersensitivity to medicines',
+                    met: hypersensitivity === 'Yes',
+                    value: hypersensitivity || 'Not answered',
+                    filled: hypersensitivity !== null
+                }
             ];
             
             let allInclusionMet = true;
@@ -2979,58 +3171,58 @@
             let allFieldsFilled = true;
             let reasons = [];
             
-            // Check inclusion criteria (all must be Yes)
+            // Build inclusion HTML
             let inclusionHtml = '';
             inclusionCriteria.forEach(criterion => {
-                const value = getCheckboxGroupValue(criterion.field);
                 let statusClass = 'pending';
                 let statusText = '--';
                 let itemClass = 'pending';
                 
-                if (value === 'Yes') {
+                if (!criterion.filled) {
+                    allFieldsFilled = false;
+                } else if (criterion.met) {
                     statusClass = 'yes';
-                    statusText = 'YES ✓';
+                    statusText = '✓ MET';
                     itemClass = 'met';
-                } else if (value === 'No') {
+                } else {
                     statusClass = 'no';
-                    statusText = 'NO ✗';
+                    statusText = '✗ NOT MET';
                     itemClass = 'not-met';
                     allInclusionMet = false;
                     reasons.push(`Inclusion not met: ${criterion.label}`);
-                } else {
-                    allFieldsFilled = false;
                 }
                 
                 inclusionHtml += `<div class="criteria-item ${itemClass}">
                     <span>${criterion.label}</span>
+                    <span class="criteria-value">${criterion.value}</span>
                     <span class="criteria-status ${statusClass}">${statusText}</span>
                 </div>`;
             });
             
-            // Check exclusion criteria (all must be No)
+            // Build exclusion HTML
             let exclusionHtml = '';
             exclusionCriteria.forEach(criterion => {
-                const value = getCheckboxGroupValue(criterion.field);
                 let statusClass = 'pending';
                 let statusText = '--';
                 let itemClass = 'pending';
                 
-                if (value === 'No') {
+                if (!criterion.filled) {
+                    allFieldsFilled = false;
+                } else if (!criterion.met) {
                     statusClass = 'yes';
-                    statusText = 'NO ✓';
+                    statusText = '✓ CLEAR';
                     itemClass = 'met';
-                } else if (value === 'Yes') {
+                } else {
                     statusClass = 'no';
-                    statusText = 'YES ✗';
+                    statusText = '✗ PRESENT';
                     itemClass = 'not-met';
                     anyExclusionMet = true;
                     reasons.push(`Exclusion present: ${criterion.label}`);
-                } else {
-                    allFieldsFilled = false;
                 }
                 
                 exclusionHtml += `<div class="criteria-item ${itemClass}">
                     <span>${criterion.label}</span>
+                    <span class="criteria-value">${criterion.value}</span>
                     <span class="criteria-status ${statusClass}">${statusText}</span>
                 </div>`;
             });
@@ -3050,11 +3242,11 @@
             if (resultDiv && summaryDiv) {
                 if (!allFieldsFilled) {
                     resultDiv.className = 'eligibility-result pending';
-                    resultDiv.innerHTML = '⏳ COMPLETE ALL CRITERIA TO SEE ELIGIBILITY';
+                    resultDiv.innerHTML = '⏳ COMPLETE ALL FIELDS TO SEE ELIGIBILITY';
                     summaryDiv.className = 'eligibility-summary';
                 } else if (isEligible) {
                     resultDiv.className = 'eligibility-result eligible';
-                    resultDiv.innerHTML = '✅ PATIENT IS ELIGIBLE';
+                    resultDiv.innerHTML = '✅ PATIENT IS ELIGIBLE FOR ENROLLMENT';
                     summaryDiv.className = 'eligibility-summary eligible';
                 } else {
                     resultDiv.className = 'eligibility-result not-eligible';
@@ -3080,6 +3272,11 @@
         function getCheckboxGroupValue(fieldName) {
             const checkedBox = document.querySelector(`input[name="${fieldName}"]:checked`);
             return checkedBox ? checkedBox.value : null;
+        }
+        
+        function getRadioValue(fieldName) {
+            const checkedRadio = document.querySelector(`input[name="${fieldName}"]:checked`);
+            return checkedRadio ? checkedRadio.value : null;
         }
 
         // Cascading dropdown handlers
@@ -3355,8 +3552,17 @@
             });
             
             const formData = new FormData(e.target);
-            const patientId = document.getElementById('patient_id').value;
+            let patientId = document.getElementById('patient_id').value;
             const day = parseInt(document.getElementById('follow_up_day').value);
+            
+            // For screening, use patient_identity_number (which includes initials)
+            if (state.currentMode === 'screening') {
+                const identityField = document.querySelector('input[name="patient_identity_number"]');
+                if (identityField && identityField.value) {
+                    patientId = identityField.value;
+                    document.getElementById('patient_id').value = patientId;
+                }
+            }
             
             // For screening, get the auto-calculated eligibility from hidden fields
             let isEligible = false;
@@ -3500,15 +3706,16 @@
             }
             
             if (state.currentMode === 'screening' && isEligible) {
+                showNotification(`✅ Screening submitted successfully! Patient ${data.patient_name} is ELIGIBLE for enrollment.`, 'success');
                 showVouchers(patientId, data);
             } else if (state.currentMode === 'screening' && !isEligible) {
-                showNotification(`Patient is NOT ELIGIBLE. Reason: ${eligibilityReason || 'Criteria not met'}`, 'warning');
+                showNotification(`❌ Screening submitted. Patient is NOT ELIGIBLE. Reason: ${eligibilityReason || 'Criteria not met'}`, 'warning');
                 resetForm();
             } else if (shouldWithdraw) {
-                showNotification(`⛔ PATIENT IS NOW OUT OF STUDY. Reason: ${withdrawalReason}. Day ${day} data saved. No further follow-up allowed.`, 'warning');
+                showNotification(`⛔ Day ${day} submitted. PATIENT IS NOW OUT OF STUDY. Reason: ${withdrawalReason}. No further follow-up allowed.`, 'warning');
                 resetForm();
             } else {
-                showNotification(`Day ${day} data submitted successfully!`, 'success');
+                showNotification(`✅ Day ${day} data submitted successfully!`, 'success');
                 resetForm();
             }
         }
@@ -3838,7 +4045,35 @@
             document.getElementById('daySelector').classList.add('show');
             document.getElementById('formCard').style.display = 'none';
             
-            showNotification(`Patient ${patient.patientName} selected - Choose follow-up day`, 'success');
+            // If a specific day was scanned, automatically select it
+            if (preferredDay !== null) {
+                const completedDays = patient.completedDays || [];
+                
+                // Check if this day can be selected
+                if (completedDays.includes(preferredDay)) {
+                    showNotification(`Day ${preferredDay} already completed. Please select next available day.`, 'warning');
+                } else {
+                    // Verify sequential order
+                    let followUpDays = CONFIG.FOLLOW_UP_DAYS;
+                    if (patient.studyMedicine && CONFIG.MEDICINES[patient.studyMedicine]) {
+                        followUpDays = CONFIG.MEDICINES[patient.studyMedicine].followUpDays;
+                    }
+                    const dayIndex = followUpDays.indexOf(preferredDay);
+                    const previousDay = dayIndex > 0 ? followUpDays[dayIndex - 1] : null;
+                    
+                    if (previousDay === null || completedDays.includes(previousDay)) {
+                        // Day is valid, auto-select it
+                        showNotification(`Patient ${patient.patientName} - Opening Day ${preferredDay} form...`, 'success');
+                        setTimeout(() => selectDay(preferredDay), 500);
+                        return;
+                    } else {
+                        showNotification(`Cannot open Day ${preferredDay}. Please complete Day ${previousDay} first.`, 'warning');
+                    }
+                }
+            } else {
+                showNotification(`Patient ${patient.patientName} selected - Choose follow-up day`, 'success');
+            }
+            
             window.scrollTo({ top: document.getElementById('daySelector').offsetTop - 20, behavior: 'smooth' });
         }
 
