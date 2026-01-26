@@ -139,6 +139,118 @@
         .control-btn.view-data-btn:hover { background: #5a32a3; border-color: #5a32a3; }
         .control-btn.dashboard-btn { background: #fd7e14; border-color: #fd7e14; }
         .control-btn.dashboard-btn:hover { background: #e96b02; border-color: #e96b02; }
+        .control-btn.dhis2-btn { background: #0d6efd; border-color: #0d6efd; }
+        .control-btn.dhis2-btn:hover { background: #0b5ed7; border-color: #0b5ed7; }
+
+        /* DHIS2 MODAL */
+        .dhis2-modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none; justify-content: center; align-items: flex-start;
+            z-index: 3000; padding: 20px; overflow-y: auto;
+        }
+        .dhis2-modal.show { display: flex; }
+        .dhis2-container {
+            background: #ffffff;
+            border-radius: 12px;
+            max-width: 700px;
+            width: 100%;
+            border: 4px double #0d6efd;
+            margin: 20px auto;
+        }
+        .dhis2-header {
+            background: #0d6efd;
+            color: #ffffff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .dhis2-title { font-size: 16px; }
+        .dhis2-close { background: none; border: none; color: #ffffff; font-size: 24px; cursor: pointer; }
+        .dhis2-content { padding: 20px; }
+        .dhis2-tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #dee2e6; }
+        .dhis2-tab {
+            padding: 10px 20px;
+            border: none;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Oswald', Arial, sans-serif;
+            border-radius: 6px 6px 0 0;
+            margin-bottom: -2px;
+        }
+        .dhis2-tab.active { background: #0d6efd; color: #ffffff; }
+        .dhis2-tab-content { display: none; }
+        .dhis2-tab-content.active { display: block; }
+        .dhis2-form-group { margin-bottom: 15px; }
+        .dhis2-label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 13px; color: #004080; }
+        .dhis2-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #0d6efd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Oswald', Arial, sans-serif;
+        }
+        .dhis2-input:focus { outline: none; border-color: #004080; }
+        .dhis2-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Oswald', Arial, sans-serif;
+            border: 2px solid;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        .dhis2-btn.primary { background: #0d6efd; color: #ffffff; border-color: #0d6efd; }
+        .dhis2-btn.primary:hover { background: #0b5ed7; }
+        .dhis2-btn.success { background: #28a745; color: #ffffff; border-color: #28a745; }
+        .dhis2-btn.success:hover { background: #218838; }
+        .dhis2-btn.danger { background: #dc3545; color: #ffffff; border-color: #dc3545; }
+        .dhis2-btn.danger:hover { background: #c82333; }
+        .dhis2-btn.warning { background: #ffc107; color: #000000; border-color: #ffc107; }
+        .dhis2-btn.warning:hover { background: #e0a800; }
+        .dhis2-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .dhis2-status {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        .dhis2-status.info { background: #e7f3ff; border: 1px solid #0d6efd; color: #0d6efd; }
+        .dhis2-status.success { background: #d4edda; border: 1px solid #28a745; color: #155724; }
+        .dhis2-status.error { background: #f8d7da; border: 1px solid #dc3545; color: #721c24; }
+        .dhis2-status.warning { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
+        .dhis2-log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+        .dhis2-log-entry { margin-bottom: 5px; }
+        .dhis2-log-entry.error { color: #ff6b6b; }
+        .dhis2-log-entry.success { color: #51cf66; }
+        .dhis2-log-entry.info { color: #74c0fc; }
+        .dhis2-checkbox-group { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px; }
+        .dhis2-checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; }
+        .dhis2-checkbox-label input { width: 18px; height: 18px; cursor: pointer; }
+        .dhis2-section { border: 2px solid #dee2e6; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .dhis2-section-title { font-size: 14px; font-weight: 700; color: #0d6efd; margin-bottom: 12px; border-bottom: 1px solid #dee2e6; padding-bottom: 8px; }
+        .dhis2-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 15px; }
+        .dhis2-stat-card { background: #f8f9fa; padding: 12px; border-radius: 6px; text-align: center; border: 1px solid #dee2e6; }
+        .dhis2-stat-value { font-size: 24px; font-weight: 700; color: #0d6efd; }
+        .dhis2-stat-label { font-size: 11px; color: #666; margin-top: 5px; }
+        .dhis2-progress { width: 100%; height: 20px; background: #e9ecef; border-radius: 10px; overflow: hidden; margin-top: 15px; }
+        .dhis2-progress-bar { height: 100%; background: linear-gradient(90deg, #0d6efd, #28a745); transition: width 0.3s ease; }
 
         /* DASHBOARD MODAL */
         .dashboard-modal {
@@ -1049,7 +1161,8 @@
                 <button class="control-btn" onclick="openPatientsModal()">PATIENTS (<span id="patientCountBadge">0</span>)</button>
                 <button class="control-btn view-data-btn" onclick="openViewDataModal()">VIEW DATA</button>
                 <button class="control-btn dashboard-btn" onclick="openDashboard()">DASHBOARD</button>
-                <button class="control-btn" id="logoutBtn" onclick="handleLogout()">LOGOUT</button>
+                <button class="control-btn dhis2-btn" onclick="openDhis2Modal()">DHIS2 SYNC</button>
+                <button class="control-btn" id="logoutBtn" onclick="handleLogout()">LOGOUT</button>>LOGOUT</button>
             </div>
 
             <div class="status-bar">
@@ -1219,6 +1332,98 @@
         </div>
     </div>
 
+    <!-- DHIS2 INTEGRATION MODAL -->
+    <div class="dhis2-modal" id="dhis2Modal">
+        <div class="dhis2-container">
+            <div class="dhis2-header">
+                <span class="dhis2-title">🔗 DHIS2 SYNC</span>
+                <button class="dhis2-close" onclick="closeDhis2Modal()">&times;</button>
+            </div>
+            <div class="dhis2-content">
+                
+                <!-- USER VIEW - Simple Sync -->
+                <div id="dhis2UserView">
+                    <div class="dhis2-section">
+                        <div class="dhis2-section-title">📊 Data Ready to Sync</div>
+                        <div class="dhis2-stats">
+                            <div class="dhis2-stat-card">
+                                <div class="dhis2-stat-value" id="syncScreeningCount">0</div>
+                                <div class="dhis2-stat-label">Screening</div>
+                            </div>
+                            <div class="dhis2-stat-card">
+                                <div class="dhis2-stat-value" id="syncFollowupCount">0</div>
+                                <div class="dhis2-stat-label">Follow-ups</div>
+                            </div>
+                            <div class="dhis2-stat-card">
+                                <div class="dhis2-stat-value" id="syncPatientsCount">0</div>
+                                <div class="dhis2-stat-label">Patients</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="dhis2-btn success" onclick="syncDataToDhis2()" id="syncBtn" style="width: 100%; padding: 18px; font-size: 18px; margin-top: 15px;">
+                        🚀 SYNC TO DHIS2
+                    </button>
+
+                    <div id="dhis2SyncResult" style="display: none; margin-top: 15px;"></div>
+                    
+                    <div class="dhis2-progress" id="dhis2SyncProgress" style="display: none; margin-top: 15px;">
+                        <div class="dhis2-progress-bar" id="dhis2ProgressBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- ADMIN VIEW -->
+                <div id="dhis2AdminView" style="display: none;">
+                    <div class="dhis2-status info" style="margin-bottom: 15px;">
+                        <strong>Admin Mode:</strong> Setup DHIS2 metadata and manage sync
+                    </div>
+
+                    <div class="dhis2-section">
+                        <div class="dhis2-section-title">🔧 Auto-Setup DHIS2</div>
+                        <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+                            This will automatically create in DHIS2:
+                        </p>
+                        <ul style="font-size: 12px; color: #333; margin-left: 20px; margin-bottom: 15px;">
+                            <li>✅ Tracker Program for case-based data</li>
+                            <li>✅ All TES data elements (screening, follow-up, outcomes)</li>
+                            <li>✅ Program stages for Day 0-42 visits</li>
+                            <li>✅ Assign to all mapped health facilities</li>
+                        </ul>
+                        <button class="dhis2-btn success" onclick="autoSetupDhis2()" id="autoSetupBtn" style="width: 100%; padding: 15px;">
+                            ⚡ AUTO-SETUP DHIS2 (One Click)
+                        </button>
+                    </div>
+
+                    <div class="dhis2-section" style="margin-top: 15px;">
+                        <div class="dhis2-section-title">🌐 Connection Status</div>
+                        <p style="font-size: 12px;"><strong>Server:</strong> <span id="adminServerUrl">-</span></p>
+                        <p style="font-size: 12px;"><strong>User:</strong> <span id="adminUsername">-</span></p>
+                        <p style="font-size: 12px;"><strong>Health Facilities Mapped:</strong> <span id="adminOrgCount">0</span></p>
+                        <button class="dhis2-btn primary" onclick="testDhis2Connection()" style="margin-top: 10px;">TEST CONNECTION</button>
+                        <div id="dhis2ConnectionStatus" style="margin-top: 10px;"></div>
+                    </div>
+
+                    <div class="dhis2-section" style="margin-top: 15px;">
+                        <div class="dhis2-section-title">📤 Sync Data</div>
+                        <div class="dhis2-stats">
+                            <div class="dhis2-stat-card">
+                                <div class="dhis2-stat-value" id="adminSyncScreening">0</div>
+                                <div class="dhis2-stat-label">Screening</div>
+                            </div>
+                            <div class="dhis2-stat-card">
+                                <div class="dhis2-stat-value" id="adminSyncFollowup">0</div>
+                                <div class="dhis2-stat-label">Follow-ups</div>
+                            </div>
+                        </div>
+                        <button class="dhis2-btn primary" onclick="syncDataToDhis2()" style="width: 100%; margin-top: 10px;">SYNC ALL DATA</button>
+                    </div>
+
+                    <div class="dhis2-log" id="dhis2SetupLog" style="display: none; margin-top: 15px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- NOTIFICATION -->
     <div class="notification" id="notification">
         <span class="notification-text" id="notificationText"></span>
@@ -1232,8 +1437,60 @@
             SCRIPT_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
             LOGIN_USERNAME: 'tes',
             LOGIN_PASSWORD: 'tes2026',
+            ADMIN_USERNAME: 'admin',
+            ADMIN_PASSWORD: 'admin2026',
             STUDY_NUMBER: 'SL TES 2026',
-            FOLLOW_UP_DAYS: [0, 1, 2, 3, 7, 14, 21, 28, 35, 42]
+            FOLLOW_UP_DAYS: [0, 1, 2, 3, 7, 14, 21, 28, 35, 42],
+            
+            // ========================================
+            // DHIS2 CONFIGURATION - UPDATE THESE VALUES
+            // ========================================
+            DHIS2: {
+                SERVER_URL: 'https://sl.dhis2.org',         // Your DHIS2 server URL
+                USERNAME: 'tes_api_user',                    // DHIS2 API username
+                PASSWORD: 'YourPassword123',                 // DHIS2 API password
+                DATASET_CODE: 'TES_2026_SL',
+                DATASET_NAME: 'TES 2026 - Therapeutic Efficacy Study',
+                PROGRAM_CODE: 'TES_2026_TRACKER',            // For case-based/tracker
+                
+                // Health Facility Name -> DHIS2 Org Unit UID (Level 5)
+                // UPDATE THESE WITH YOUR ACTUAL DHIS2 ORG UNIT UIDs
+                ORG_UNITS: {
+                    // Northern Province
+                    'Kabala Government Hospital': 'xxxxxxx01',
+                    'Makeni Government Hospital': 'xxxxxxx02',
+                    'Magburaka Government Hospital': 'xxxxxxx03',
+                    'Falaba District Hospital': 'xxxxxxx04',
+                    // North West Province
+                    'Port Loko Government Hospital': 'xxxxxxx05',
+                    'Kambia Government Hospital': 'xxxxxxx06',
+                    'Karene District Hospital': 'xxxxxxx07',
+                    // Southern Province
+                    'Bo Government Hospital': 'xxxxxxx08',
+                    'Kenema Government Hospital': 'xxxxxxx09',
+                    'Pujehun Government Hospital': 'xxxxxxx10',
+                    'Moyamba Government Hospital': 'xxxxxxx11',
+                    'Bonthe Government Hospital': 'xxxxxxx12',
+                    // Eastern Province
+                    'Kailahun Government Hospital': 'xxxxxxx13',
+                    'Koidu Government Hospital': 'xxxxxxx14',
+                    // Western Area
+                    'Rokupa Government Hospital': 'xxxxxxx15',
+                    'Connaught Hospital': 'xxxxxxx16',
+                    'Ola During Children\'s Hospital': 'xxxxxxx17',
+                    'Waterloo Community Health Centre': 'xxxxxxx18',
+                    'Goderich Community Health Centre': 'xxxxxxx19'
+                }
+            },
+            
+            // CORS Proxies - Apps Script proxy FIRST, then fallbacks
+            CORS_PROXIES: [
+                'YOUR_APPS_SCRIPT_PROXY_URL',              // Your Google Apps Script proxy (primary)
+                'https://corsproxy.io/?',
+                'https://api.allorigins.win/raw?url=',
+                'https://cors-anywhere.herokuapp.com/',
+                'https://proxy.cors.sh/'
+            ]
         };
 
         // Cascading Location Data: Province -> District -> Health Facilities
@@ -1300,6 +1557,7 @@
             submissions: {},
             isOnline: navigator.onLine,
             isLoggedIn: false,
+            isAdmin: false,
             currentMode: null,
             currentSection: 1,
             totalSections: 0,
@@ -1674,6 +1932,7 @@
         function init() {
             loadFromLocalStorage();
             state.isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+            state.isAdmin = sessionStorage.getItem('isAdmin') === 'true';
             if (state.isLoggedIn) showMainContent();
             setupEventListeners();
         }
@@ -1712,10 +1971,24 @@
             const password = document.getElementById('password').value.trim();
             const errorDiv = document.getElementById('loginError');
             
-            if (username === CONFIG.LOGIN_USERNAME && password === CONFIG.LOGIN_PASSWORD) {
+            // Check for admin login
+            if (username === CONFIG.ADMIN_USERNAME && password === CONFIG.ADMIN_PASSWORD) {
                 sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('isAdmin', 'true');
                 sessionStorage.setItem('username', username);
                 state.isLoggedIn = true;
+                state.isAdmin = true;
+                errorDiv.classList.remove('show');
+                showMainContent();
+                showNotification('Logged in as Administrator', 'success');
+            }
+            // Check for regular user login
+            else if (username === CONFIG.LOGIN_USERNAME && password === CONFIG.LOGIN_PASSWORD) {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('isAdmin', 'false');
+                sessionStorage.setItem('username', username);
+                state.isLoggedIn = true;
+                state.isAdmin = false;
                 errorDiv.classList.remove('show');
                 showMainContent();
             } else {
@@ -1725,8 +1998,10 @@
 
         function handleLogout() {
             sessionStorage.removeItem('isLoggedIn');
+            sessionStorage.removeItem('isAdmin');
             sessionStorage.removeItem('username');
             state.isLoggedIn = false;
+            state.isAdmin = false;
             document.getElementById('mainContent').classList.remove('show');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('username').value = '';
@@ -3644,6 +3919,467 @@
         document.getElementById('patientsModal').addEventListener('click', function(e) { if (e.target === this) closePatientsModal(); });
         document.getElementById('viewDataModal').addEventListener('click', function(e) { if (e.target === this) closeViewDataModal(); });
         document.getElementById('dashboardModal').addEventListener('click', function(e) { if (e.target === this) closeDashboard(); });
+        document.getElementById('dhis2Modal').addEventListener('click', function(e) { if (e.target === this) closeDhis2Modal(); });
+
+        // ============================================
+        // DHIS2 INTEGRATION
+        // ============================================
+        const dhis2State = {
+            isConnected: false,
+            currentProxyIndex: -1,
+            programId: '',
+            programStageId: '',
+            trackedEntityTypeId: '',
+            dataElementIds: {}
+        };
+
+        // Tracker Program Data Elements for TES
+        const TES_DATA_ELEMENTS = [
+            // Screening/Enrollment attributes
+            { code: 'TES_SCREENING_NUM', name: 'TES Screening Number', valueType: 'TEXT' },
+            { code: 'TES_PATIENT_NAME', name: 'TES Patient Name', valueType: 'TEXT' },
+            { code: 'TES_PATIENT_ID', name: 'TES Patient ID', valueType: 'TEXT' },
+            { code: 'TES_DOB', name: 'TES Date of Birth', valueType: 'DATE' },
+            { code: 'TES_AGE_MONTHS', name: 'TES Age (Months)', valueType: 'INTEGER' },
+            { code: 'TES_SEX', name: 'TES Sex', valueType: 'TEXT' },
+            { code: 'TES_WEIGHT', name: 'TES Weight (kg)', valueType: 'NUMBER' },
+            { code: 'TES_PHONE', name: 'TES Phone', valueType: 'PHONE_NUMBER' },
+            // Clinical data
+            { code: 'TES_TEMPERATURE', name: 'TES Temperature', valueType: 'NUMBER' },
+            { code: 'TES_FEVER_HISTORY', name: 'TES Fever History 24h', valueType: 'BOOLEAN' },
+            { code: 'TES_PARASITE_COUNT', name: 'TES Parasite Count', valueType: 'INTEGER' },
+            { code: 'TES_SPECIES', name: 'TES Malaria Species', valueType: 'TEXT' },
+            { code: 'TES_GAMETOCYTES', name: 'TES Gametocytes Present', valueType: 'BOOLEAN' },
+            { code: 'TES_PCR_COLLECTED', name: 'TES PCR Collected', valueType: 'BOOLEAN' },
+            { code: 'TES_ELIGIBLE', name: 'TES Eligible', valueType: 'BOOLEAN' },
+            { code: 'TES_CONSENT', name: 'TES Consent Signed', valueType: 'BOOLEAN' },
+            // Follow-up data
+            { code: 'TES_FU_DAY', name: 'TES Follow-up Day', valueType: 'INTEGER' },
+            { code: 'TES_FU_TEMP', name: 'TES Follow-up Temperature', valueType: 'NUMBER' },
+            { code: 'TES_FU_PARASITES', name: 'TES Follow-up Parasite Count', valueType: 'INTEGER' },
+            { code: 'TES_FU_DANGER_SIGNS', name: 'TES Danger Signs', valueType: 'BOOLEAN' },
+            { code: 'TES_ADVERSE_EVENT', name: 'TES Adverse Event', valueType: 'BOOLEAN' },
+            { code: 'TES_AE_DESCRIPTION', name: 'TES AE Description', valueType: 'LONG_TEXT' },
+            { code: 'TES_SERIOUS_AE', name: 'TES Serious AE', valueType: 'BOOLEAN' },
+            { code: 'TES_OUTCOME', name: 'TES Treatment Outcome', valueType: 'TEXT' }
+        ];
+
+        // Get org unit UID for a health facility name
+        function getOrgUnitForFacility(facilityName) {
+            return CONFIG.DHIS2.ORG_UNITS[facilityName] || null;
+        }
+
+        // Get all mapped org unit UIDs
+        function getMappedOrgUnits() {
+            return Object.values(CONFIG.DHIS2.ORG_UNITS).filter(uid => uid && !uid.startsWith('xxxxxxx'));
+        }
+
+        // DHIS2 API call with automatic proxy fallback
+        async function dhis2Fetch(endpoint, options = {}) {
+            const url = CONFIG.DHIS2.SERVER_URL + endpoint;
+            const headers = {
+                'Authorization': 'Basic ' + btoa(CONFIG.DHIS2.USERNAME + ':' + CONFIG.DHIS2.PASSWORD),
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+            
+            const fetchOptions = { ...options, headers: { ...headers, ...options.headers } };
+
+            // Try with current working proxy first (if we found one before)
+            if (dhis2State.currentProxyIndex >= 0) {
+                try {
+                    const proxy = CONFIG.CORS_PROXIES[dhis2State.currentProxyIndex];
+                    const proxyUrl = proxy.includes('?') ? proxy + encodeURIComponent(url) : proxy + url;
+                    const response = await fetch(proxyUrl, fetchOptions);
+                    if (response.ok || response.status < 500) return response;
+                } catch (e) {
+                    console.log('Cached proxy failed, trying others...');
+                }
+            }
+
+            // Try direct connection first
+            try {
+                const response = await fetch(url, { ...fetchOptions, mode: 'cors' });
+                if (response.ok || response.status < 500) {
+                    dhis2State.currentProxyIndex = -1;
+                    return response;
+                }
+            } catch (e) {
+                console.log('Direct connection failed');
+            }
+
+            // Try each proxy
+            for (let i = 0; i < CONFIG.CORS_PROXIES.length; i++) {
+                try {
+                    const proxy = CONFIG.CORS_PROXIES[i];
+                    if (proxy === 'YOUR_APPS_SCRIPT_PROXY_URL') continue; // Skip placeholder
+                    
+                    const proxyUrl = proxy.includes('?') ? proxy + encodeURIComponent(url) : proxy + url;
+                    console.log(`Trying proxy ${i + 1}: ${proxy.substring(0, 30)}...`);
+                    
+                    const response = await fetch(proxyUrl, fetchOptions);
+                    if (response.ok || response.status < 500) {
+                        dhis2State.currentProxyIndex = i;
+                        console.log(`Proxy ${i + 1} working!`);
+                        return response;
+                    }
+                } catch (e) {
+                    console.log(`Proxy ${i + 1} failed`);
+                }
+            }
+            
+            throw new Error('All connection methods failed. Check DHIS2 URL and credentials.');
+        }
+
+        // Test DHIS2 connection
+        async function testDhis2Connection() {
+            const statusDiv = document.getElementById('dhis2ConnectionStatus');
+            statusDiv.innerHTML = '<div class="dhis2-status info">🔄 Testing connection...</div>';
+            
+            try {
+                const response = await dhis2Fetch('/api/me');
+                if (response.ok) {
+                    const user = await response.json();
+                    dhis2State.isConnected = true;
+                    statusDiv.innerHTML = `<div class="dhis2-status success">✅ Connected as: ${user.displayName || user.name}</div>`;
+                    showNotification('DHIS2 connection successful!', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                dhis2State.isConnected = false;
+                statusDiv.innerHTML = `<div class="dhis2-status error">❌ ${error.message}</div>`;
+            }
+        }
+
+        // AUTO-SETUP: Creates everything in DHIS2 with one click
+        async function autoSetupDhis2() {
+            if (!state.isAdmin) {
+                showNotification('Admin access required', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('autoSetupBtn');
+            const logDiv = document.getElementById('dhis2SetupLog');
+            
+            btn.disabled = true;
+            btn.innerHTML = '⏳ SETTING UP...';
+            logDiv.style.display = 'block';
+            logDiv.innerHTML = '';
+
+            try {
+                logEntry('dhis2SetupLog', '🚀 Starting DHIS2 Auto-Setup...', 'info');
+                logEntry('dhis2SetupLog', `Server: ${CONFIG.DHIS2.SERVER_URL}`, 'info');
+
+                // 1. Test connection
+                logEntry('dhis2SetupLog', '🔗 Testing connection...', 'info');
+                const meResponse = await dhis2Fetch('/api/me');
+                if (!meResponse.ok) throw new Error('Connection failed');
+                const user = await meResponse.json();
+                logEntry('dhis2SetupLog', `✅ Connected as: ${user.displayName}`, 'success');
+                dhis2State.isConnected = true;
+
+                // 2. Get or create tracked entity type
+                logEntry('dhis2SetupLog', '👤 Setting up Tracked Entity Type...', 'info');
+                let tetId = await findOrCreate('trackedEntityTypes', {
+                    name: 'TES Patient',
+                    code: 'TES_PATIENT'
+                }, 'TES_PATIENT');
+                dhis2State.trackedEntityTypeId = tetId;
+                logEntry('dhis2SetupLog', `✅ Tracked Entity Type: ${tetId}`, 'success');
+
+                // 3. Create data elements
+                logEntry('dhis2SetupLog', '📝 Creating Data Elements...', 'info');
+                for (const de of TES_DATA_ELEMENTS) {
+                    try {
+                        const deId = await findOrCreate('dataElements', {
+                            name: de.name,
+                            shortName: de.name.substring(0, 50),
+                            code: de.code,
+                            valueType: de.valueType,
+                            domainType: 'TRACKER',
+                            aggregationType: 'NONE'
+                        }, de.code);
+                        dhis2State.dataElementIds[de.code] = deId;
+                        logEntry('dhis2SetupLog', `  ✅ ${de.code}`, 'success');
+                    } catch (e) {
+                        logEntry('dhis2SetupLog', `  ⚠️ ${de.code} (may exist)`, 'info');
+                    }
+                }
+
+                // 4. Create Program
+                logEntry('dhis2SetupLog', '📋 Creating Tracker Program...', 'info');
+                const orgUnits = getMappedOrgUnits();
+                const programId = await findOrCreate('programs', {
+                    name: CONFIG.DHIS2.DATASET_NAME,
+                    shortName: 'TES 2026',
+                    code: CONFIG.DHIS2.PROGRAM_CODE || 'TES_2026_TRACKER',
+                    programType: 'WITH_REGISTRATION',
+                    trackedEntityType: { id: tetId },
+                    organisationUnits: orgUnits.map(id => ({ id }))
+                }, CONFIG.DHIS2.PROGRAM_CODE || 'TES_2026_TRACKER');
+                dhis2State.programId = programId;
+                logEntry('dhis2SetupLog', `✅ Program created: ${programId}`, 'success');
+
+                // 5. Create Program Stage
+                logEntry('dhis2SetupLog', '📅 Creating Program Stage...', 'info');
+                const stageId = await findOrCreate('programStages', {
+                    name: 'TES Visit',
+                    code: 'TES_VISIT_STAGE',
+                    program: { id: programId },
+                    repeatable: true,
+                    programStageDataElements: Object.keys(dhis2State.dataElementIds).map(code => ({
+                        dataElement: { id: dhis2State.dataElementIds[code] },
+                        compulsory: false
+                    }))
+                }, 'TES_VISIT_STAGE');
+                dhis2State.programStageId = stageId;
+                logEntry('dhis2SetupLog', `✅ Program Stage: ${stageId}`, 'success');
+
+                // Save state
+                localStorage.setItem('tes_dhis2_state', JSON.stringify(dhis2State));
+
+                logEntry('dhis2SetupLog', '', 'info');
+                logEntry('dhis2SetupLog', '🎉 AUTO-SETUP COMPLETE!', 'success');
+                logEntry('dhis2SetupLog', `Program ID: ${programId}`, 'info');
+                logEntry('dhis2SetupLog', `Org Units: ${orgUnits.length} facilities`, 'info');
+                
+                showNotification('✅ DHIS2 setup complete!', 'success');
+
+            } catch (error) {
+                logEntry('dhis2SetupLog', `❌ Error: ${error.message}`, 'error');
+                showNotification('Setup failed: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '⚡ AUTO-SETUP DHIS2 (One Click)';
+            }
+        }
+
+        // Helper: Find existing or create new metadata
+        async function findOrCreate(endpoint, payload, code) {
+            // Search first
+            try {
+                const searchResp = await dhis2Fetch(`/api/${endpoint}?filter=code:eq:${code}&fields=id`);
+                if (searchResp.ok) {
+                    const data = await searchResp.json();
+                    if (data[endpoint]?.length > 0) {
+                        return data[endpoint][0].id;
+                    }
+                }
+            } catch (e) { }
+
+            // Create new
+            const createResp = await dhis2Fetch(`/api/${endpoint}`, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            
+            if (createResp.ok || createResp.status === 201) {
+                const result = await createResp.json();
+                return result.response?.uid || result.response?.lastImported || code;
+            }
+            
+            // If conflict (already exists), try to find it
+            if (createResp.status === 409) {
+                const searchResp = await dhis2Fetch(`/api/${endpoint}?filter=code:eq:${code}&fields=id`);
+                const data = await searchResp.json();
+                if (data[endpoint]?.length > 0) {
+                    return data[endpoint][0].id;
+                }
+            }
+            
+            throw new Error(`Failed to create ${endpoint}: ${createResp.status}`);
+        }
+
+        // SYNC: Push data to DHIS2
+        async function syncDataToDhis2() {
+            const btn = document.getElementById('syncBtn');
+            const progressDiv = document.getElementById('dhis2SyncProgress');
+            const progressBar = document.getElementById('dhis2ProgressBar');
+            const resultDiv = document.getElementById('dhis2SyncResult');
+            
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '🔄 SYNCING...';
+            }
+            if (progressDiv) progressDiv.style.display = 'block';
+            if (progressBar) progressBar.style.width = '10%';
+            if (resultDiv) resultDiv.style.display = 'none';
+
+            try {
+                // Load saved DHIS2 state
+                const savedState = localStorage.getItem('tes_dhis2_state');
+                if (savedState) {
+                    Object.assign(dhis2State, JSON.parse(savedState));
+                }
+
+                // Gather data
+                const patients = Object.values(state.patients);
+                const eligiblePatients = patients.filter(p => p.isEligible);
+                const submissions = state.submissions;
+                
+                if (progressBar) progressBar.style.width = '30%';
+
+                let syncedCount = 0;
+                let errorCount = 0;
+
+                // Sync each eligible patient
+                for (const patient of eligiblePatients) {
+                    try {
+                        const orgUnit = getOrgUnitForFacility(patient.health_centre_name);
+                        if (!orgUnit || orgUnit.startsWith('xxxxxxx')) {
+                            console.log(`Skipping ${patient.patient_id}: No org unit mapping for ${patient.health_centre_name}`);
+                            continue;
+                        }
+
+                        // Create/Update Tracked Entity Instance
+                        const teiPayload = {
+                            trackedEntityType: dhis2State.trackedEntityTypeId,
+                            orgUnit: orgUnit,
+                            attributes: [
+                                { attribute: dhis2State.dataElementIds['TES_PATIENT_ID'], value: patient.patient_identity_number || patient.patient_id },
+                                { attribute: dhis2State.dataElementIds['TES_PATIENT_NAME'], value: patient.patient_name || '' },
+                                { attribute: dhis2State.dataElementIds['TES_SCREENING_NUM'], value: patient.patient_screening_number || '' }
+                            ].filter(a => a.attribute && a.value)
+                        };
+
+                        // For simplicity, we'll use events instead of full tracker
+                        const eventPayload = {
+                            program: dhis2State.programId,
+                            programStage: dhis2State.programStageId,
+                            orgUnit: orgUnit,
+                            eventDate: patient.date_of_visit || new Date().toISOString().split('T')[0],
+                            status: 'COMPLETED',
+                            dataValues: [
+                                { dataElement: dhis2State.dataElementIds['TES_PATIENT_NAME'], value: patient.patient_name },
+                                { dataElement: dhis2State.dataElementIds['TES_PATIENT_ID'], value: patient.patient_identity_number },
+                                { dataElement: dhis2State.dataElementIds['TES_WEIGHT'], value: patient.weight_kg },
+                                { dataElement: dhis2State.dataElementIds['TES_TEMPERATURE'], value: patient.temperature },
+                                { dataElement: dhis2State.dataElementIds['TES_PARASITE_COUNT'], value: patient.approx_parasite_count },
+                                { dataElement: dhis2State.dataElementIds['TES_ELIGIBLE'], value: patient.isEligible ? 'true' : 'false' }
+                            ].filter(dv => dv.dataElement && dv.value !== undefined && dv.value !== '')
+                        };
+
+                        const eventResp = await dhis2Fetch('/api/events', {
+                            method: 'POST',
+                            body: JSON.stringify(eventPayload)
+                        });
+
+                        if (eventResp.ok || eventResp.status === 201) {
+                            syncedCount++;
+                        } else {
+                            errorCount++;
+                        }
+                    } catch (e) {
+                        errorCount++;
+                        console.error('Sync error for patient:', e);
+                    }
+                }
+
+                if (progressBar) progressBar.style.width = '100%';
+
+                // Show result
+                if (resultDiv) {
+                    resultDiv.innerHTML = `
+                        <div class="dhis2-status ${errorCount === 0 ? 'success' : 'warning'}">
+                            <h3 style="margin: 0 0 10px 0;">${errorCount === 0 ? '✅ Sync Complete!' : '⚠️ Sync Completed with Errors'}</h3>
+                            <p><strong>Synced:</strong> ${syncedCount} patients</p>
+                            ${errorCount > 0 ? `<p><strong>Errors:</strong> ${errorCount}</p>` : ''}
+                            <p style="margin-top: 10px; font-size: 11px; color: #666;">
+                                ${new Date().toLocaleString()}
+                            </p>
+                        </div>
+                    `;
+                    resultDiv.style.display = 'block';
+                }
+
+                showNotification(`✅ Synced ${syncedCount} patients to DHIS2`, 'success');
+
+            } catch (error) {
+                if (resultDiv) {
+                    resultDiv.innerHTML = `
+                        <div class="dhis2-status error">
+                            <h3 style="margin: 0 0 10px 0;">❌ Sync Failed</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                    resultDiv.style.display = 'block';
+                }
+                showNotification('Sync failed: ' + error.message, 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '🚀 SYNC TO DHIS2';
+                }
+                setTimeout(() => {
+                    if (progressDiv) progressDiv.style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        // Update sync stats display
+        function updateSyncStats() {
+            const patients = Object.values(state.patients);
+            const screeningCount = patients.filter(p => p.isEligible).length;
+            const followupCount = Object.keys(state.submissions).filter(k => k.includes('_')).length;
+            const patientsCount = patients.length;
+            
+            // User view
+            const el1 = document.getElementById('syncScreeningCount');
+            const el2 = document.getElementById('syncFollowupCount');
+            const el3 = document.getElementById('syncPatientsCount');
+            if (el1) el1.textContent = screeningCount;
+            if (el2) el2.textContent = followupCount;
+            if (el3) el3.textContent = patientsCount;
+            
+            // Admin view
+            const el4 = document.getElementById('adminSyncScreening');
+            const el5 = document.getElementById('adminSyncFollowup');
+            if (el4) el4.textContent = screeningCount;
+            if (el5) el5.textContent = followupCount;
+        }
+
+        // Open DHIS2 Modal
+        function openDhis2Modal() {
+            document.getElementById('dhis2Modal').classList.add('show');
+            
+            if (state.isAdmin) {
+                document.getElementById('dhis2UserView').style.display = 'none';
+                document.getElementById('dhis2AdminView').style.display = 'block';
+                
+                // Show admin info
+                const serverEl = document.getElementById('adminServerUrl');
+                const userEl = document.getElementById('adminUsername');
+                const orgEl = document.getElementById('adminOrgCount');
+                
+                if (serverEl) serverEl.textContent = CONFIG.DHIS2.SERVER_URL;
+                if (userEl) userEl.textContent = CONFIG.DHIS2.USERNAME;
+                if (orgEl) orgEl.textContent = Object.keys(CONFIG.DHIS2.ORG_UNITS).length;
+            } else {
+                document.getElementById('dhis2UserView').style.display = 'block';
+                document.getElementById('dhis2AdminView').style.display = 'none';
+            }
+            
+            updateSyncStats();
+        }
+
+        function closeDhis2Modal() {
+            document.getElementById('dhis2Modal').classList.remove('show');
+        }
+
+        function showDhis2Status(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            if (el) el.innerHTML = `<div class="dhis2-status ${type}">${message}</div>`;
+        }
+
+        function logEntry(logId, message, type = 'info') {
+            const el = document.getElementById(logId);
+            if (el) {
+                const time = new Date().toLocaleTimeString();
+                el.innerHTML += `<div class="dhis2-log-entry ${type}">[${time}] ${message}</div>`;
+                el.scrollTop = el.scrollHeight;
+            }
+        }
 
         init();
     </script>
