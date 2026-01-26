@@ -608,6 +608,101 @@
         .criteria-list li { font-size: 12px; margin-bottom: 6px; padding-left: 20px; position: relative; }
         .criteria-list li::before { content: "•"; position: absolute; left: 5px; color: #004080; }
 
+        /* CONSENT INFO BOX */
+        .consent-info-box {
+            background: linear-gradient(135deg, #e7f3ff 0%, #f0f7ff 100%);
+            border: 2px solid #004080;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .consent-info-box h4 {
+            color: #004080;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #004080;
+            padding-bottom: 10px;
+        }
+        .consent-info-box p {
+            margin-bottom: 10px;
+        }
+        .consent-info-box strong {
+            color: #004080;
+        }
+        .consent-info-box hr {
+            border: none;
+            border-top: 1px dashed #004080;
+            margin: 15px 0;
+        }
+
+        /* SIGNATURE PAD */
+        .signature-container {
+            border: 2px solid #004080;
+            border-radius: 8px;
+            background: #ffffff;
+            overflow: hidden;
+            width: 100%;
+        }
+        .signature-pad {
+            width: 100%;
+            height: 150px;
+            cursor: crosshair;
+            touch-action: none;
+            display: block;
+            background: #fff;
+        }
+        .signature-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        .signature-label {
+            font-size: 11px;
+            color: #666;
+        }
+        .signature-clear-btn {
+            background: #dc3545;
+            color: #ffffff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: 'Oswald', Arial, sans-serif;
+        }
+        .signature-clear-btn:hover {
+            background: #c82333;
+        }
+        .signature-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #999;
+            font-size: 14px;
+            pointer-events: none;
+            user-select: none;
+        }
+        .signature-wrapper {
+            position: relative;
+            width: 100%;
+            background: #fff;
+        }
+        .signature-wrapper.has-signature .signature-placeholder {
+            display: none;
+        }
+        .signature-input {
+            display: none;
+        }
+
         /* MEDICATION TABLE */
         .medication-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .medication-table th, .medication-table td { border: 1px solid #004080; padding: 8px; text-align: left; font-size: 12px; }
@@ -1141,16 +1236,60 @@
             FOLLOW_UP_DAYS: [0, 1, 2, 3, 7, 14, 21, 28, 35, 42]
         };
 
-        // Health Centres - Dropdown options
-        const HEALTH_CENTRES = [
-            'Kabala Government Hospital',
-            'Makeni Government Hospital',
-            'Port Loko Government Hospital',
-            'Rokupa Government Hospital',
-            'Bo Government Hospital',
-            'Kenema Government Hospital',
-            'Kailahun Government Hospital'
-        ];
+        // Cascading Location Data: Province -> District -> Health Facilities
+        const LOCATION_DATA = {
+            'Northern Province': {
+                districts: {
+                    'Koinadugu': ['Kabala Government Hospital'],
+                    'Bombali': ['Makeni Government Hospital'],
+                    'Tonkolili': ['Magburaka Government Hospital'],
+                    'Falaba': ['Falaba District Hospital']
+                }
+            },
+            'North West Province': {
+                districts: {
+                    'Port Loko': ['Port Loko Government Hospital'],
+                    'Kambia': ['Kambia Government Hospital'],
+                    'Karene': ['Karene District Hospital']
+                }
+            },
+            'Southern Province': {
+                districts: {
+                    'Bo': ['Bo Government Hospital'],
+                    'Bonthe': ['Bonthe Government Hospital'],
+                    'Moyamba': ['Moyamba Government Hospital'],
+                    'Pujehun': ['Pujehun Government Hospital']
+                }
+            },
+            'Eastern Province': {
+                districts: {
+                    'Kenema': ['Kenema Government Hospital'],
+                    'Kailahun': ['Kailahun Government Hospital'],
+                    'Kono': ['Koidu Government Hospital']
+                }
+            },
+            'Western Area': {
+                districts: {
+                    'Western Area Urban': ['Rokupa Government Hospital', 'Connaught Hospital', 'Ola During Children\'s Hospital'],
+                    'Western Area Rural': ['Waterloo Community Health Centre', 'Goderich Community Health Centre']
+                }
+            }
+        };
+
+        // Helper functions for cascading dropdowns
+        function getProvinces() {
+            return Object.keys(LOCATION_DATA);
+        }
+
+        function getDistrictsByProvince(province) {
+            if (!province || !LOCATION_DATA[province]) return [];
+            return Object.keys(LOCATION_DATA[province].districts);
+        }
+
+        function getHealthFacilitiesByDistrict(province, district) {
+            if (!province || !district || !LOCATION_DATA[province]) return [];
+            return LOCATION_DATA[province].districts[district] || [];
+        }
 
         // ============================================
         // STATE
@@ -1173,17 +1312,76 @@
         // EXACT FORM SECTIONS FROM ORIGINAL DOCUMENT
         // ============================================
         
+        // CONSENT FORM - Based on 2026 TES Consent for AL
+        const CONSENT_SECTIONS = [
+            {
+                title: 'Informed Consent - Information Sheet',
+                description: 'Study information for parents/caretakers of children aged 6 to 59 months',
+                isInfoSection: true,
+                infoContent: `
+                    <div class="consent-info-box">
+                        <h4>THERAPEUTIC EFFICACY STUDY (TES) 2026</h4>
+                        <p><strong>Study:</strong> Efficacy and safety of artemether-lumefantrine for the treatment of uncomplicated Plasmodium falciparum malaria among children 6-59 months in Sierra Leone</p>
+                        <p><strong>Sponsor:</strong> President's Malaria Initiative (PMI) / Ministry of Health</p>
+                        <hr>
+                        <p><strong>Purpose:</strong> We are doing a study to verify that the medicine artemether-lumefantrine is still effective for treating malaria.</p>
+                        <p><strong>Participation:</strong> Your decision to have your child participate is entirely voluntary. Whether you choose to participate or not, all services your child receives will continue.</p>
+                        <p><strong>Treatment:</strong> Your child will receive 6 doses of medicine over 3 days. The medicine is recommended by the Ministry of Health to treat malaria.</p>
+                        <p><strong>Duration:</strong> The study will take place over 28-42 days with scheduled visits.</p>
+                        <p><strong>Blood Tests:</strong> A small amount of blood (4-6 drops) will be taken from your child's fingertip. Blood samples will only be used to study malaria.</p>
+                        <p><strong>Risks:</strong> The medicine may cause minor side effects such as abdominal pain, cough, diarrhoea, dizziness, fever, headache, nausea, and vomiting. These usually resolve quickly.</p>
+                        <p><strong>Benefits:</strong> Your child's participation will help ensure the medicine is still working. Treatment will be provided at no charge.</p>
+                        <p><strong>Confidentiality:</strong> Information collected will be kept confidential. Your child will be identified by a number, not by name.</p>
+                        <p><strong>Ethics Approval:</strong> This study has been approved by the Sierra Leone Ethics and Scientific Review Committee.</p>
+                    </div>
+                `,
+                fields: [
+                    { name: 'info_sheet_read', label: 'I have read/been read the information sheet above', type: 'checkbox_group', options: ['Yes'], required: true }
+                ]
+            },
+            {
+                title: 'Certificate of Consent',
+                description: 'Parent/Guardian consent for child participation',
+                fields: [
+                    { name: 'consent_child_name', label: 'Name of Child (Participant)', type: 'text', required: true },
+                    { name: 'consent_parent_name', label: 'Name of Parent/Guardian (Print in full)', type: 'text', required: true },
+                    { name: 'consent_parent_signature', label: 'Parent/Guardian Signature (Optional)', type: 'signature', required: false },
+                    { name: 'consent_date', label: 'Date', type: 'date', required: true },
+                    { name: 'consent_parent_literate', label: 'Is the parent/guardian literate?', type: 'checkbox_group', options: ['Yes', 'No'], required: true }
+                ]
+            },
+            {
+                title: 'Witness (If Parent/Guardian is Illiterate)',
+                description: 'Required only if parent/guardian cannot read',
+                fields: [
+                    { name: 'witness_required', label: 'Witness signature required?', type: 'checkbox_group', options: ['Yes', 'No - Parent is literate'], required: true },
+                    { name: 'witness_name', label: 'Witness Name (Print in full)', type: 'text', required: false },
+                    { name: 'witness_signature', label: 'Witness Signature (Optional)', type: 'signature', required: false },
+                    { name: 'witness_date', label: 'Date', type: 'date', required: false }
+                ]
+            },
+            {
+                title: 'Investigator Declaration',
+                description: 'To be completed by the study investigator',
+                fields: [
+                    { name: 'investigator_name', label: 'Name of Principal Investigator', type: 'text', required: true, defaultValue: 'Prof. Rashid Ansumana', readonly: true },
+                    { name: 'investigator_date', label: 'Date', type: 'date', required: true },
+                    { name: 'consent_copy_given', label: 'A copy of this informed consent form has been provided to the participant', type: 'checkbox_group', options: ['Yes'], required: true }
+                ]
+            }
+        ];
+
         // CASE SCREENING FORM - Exact fields from document
         const SCREENING_SECTIONS = [
             {
                 title: 'Case Screening Form',
                 description: 'Patient identification and location',
                 fields: [
-                    { name: 'health_centre_name', label: 'Health centre name', type: 'select', options: HEALTH_CENTRES, required: true },
+                    { name: 'province', label: 'Province', type: 'cascade_province', required: true },
+                    { name: 'district', label: 'District', type: 'cascade_district', required: true },
+                    { name: 'health_centre_name', label: 'Health Facility Name', type: 'cascade_hf', required: true },
                     { name: 'patient_screening_number', label: 'Patient screening number', type: 'text', required: true },
-                    { name: 'district', label: 'District', type: 'text', required: true },
                     { name: 'patient_name', label: 'Patient name', type: 'text', required: true },
-                    { name: 'province', label: 'Province', type: 'text', required: true },
                     { name: 'date_of_visit', label: 'Date of visit (dd-mmm-yyyy)', type: 'date', required: true },
                     { name: 'tel', label: 'Tel', type: 'tel', required: false },
                     { name: 'address_landmark', label: 'Address/Landmark', type: 'textarea', required: false }
@@ -1556,13 +1754,15 @@
             state.selectedDay = -1;
             state.selectedPatientId = null;
             generatePatientId();
-            generateFormSections(SCREENING_SECTIONS);
+            // Combine Consent + Screening sections
+            const allScreeningSections = [...CONSENT_SECTIONS, ...SCREENING_SECTIONS];
+            generateFormSections(allScreeningSections);
             
             // Show mode indicator
             const indicator = document.getElementById('modeIndicator');
             indicator.style.display = 'flex';
             indicator.className = 'mode-indicator screening';
-            document.getElementById('currentModeLabel').textContent = 'NEW SCREENING - CASE SCREENING FORM';
+            document.getElementById('currentModeLabel').textContent = 'NEW SCREENING - CONSENT & SCREENING FORM';
             
             document.getElementById('daySelector').classList.remove('show');
             document.getElementById('formCard').style.display = 'block';
@@ -1620,6 +1820,11 @@
                         <p class="section-description">${section.description}</p>
                     </div>`;
                 
+                // Info content for consent/information sections
+                if (section.isInfoSection && section.infoContent) {
+                    html += section.infoContent;
+                }
+                
                 // Criteria list if applicable
                 if (section.showCriteria && section.criteriaItems) {
                     const boxClass = section.criteriaType === 'inclusion' ? 'inclusion' : 'exclusion';
@@ -1649,6 +1854,13 @@
             
             container.innerHTML = html;
             updateProgress();
+            
+            // Initialize signature pads after DOM is updated
+            setTimeout(() => {
+                // Clear existing pads first
+                Object.keys(signaturePads).forEach(key => delete signaturePads[key]);
+                initAllSignaturePads();
+            }, 200);
         }
 
         function generateField(field) {
@@ -1677,6 +1889,31 @@
                     <option value="">Select...</option>
                     ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
                 </select>`;
+            } else if (field.type === 'cascade_province') {
+                html += `<select class="form-select" name="${field.name}" id="cascade_province" onchange="updateDistrictDropdown()" ${field.required ? 'required' : ''}>
+                    <option value="">Select Province...</option>
+                    ${getProvinces().map(p => `<option value="${p}">${p}</option>`).join('')}
+                </select>`;
+            } else if (field.type === 'cascade_district') {
+                html += `<select class="form-select" name="${field.name}" id="cascade_district" onchange="updateHealthFacilityDropdown()" ${field.required ? 'required' : ''} disabled>
+                    <option value="">Select District...</option>
+                </select>`;
+            } else if (field.type === 'cascade_hf') {
+                html += `<select class="form-select" name="${field.name}" id="cascade_hf" ${field.required ? 'required' : ''} disabled>
+                    <option value="">Select Health Facility...</option>
+                </select>`;
+            } else if (field.type === 'signature') {
+                html += `<div class="signature-container">
+                    <div class="signature-wrapper" id="sigWrapper_${field.name}">
+                        <canvas class="signature-pad" id="sigPad_${field.name}"></canvas>
+                        <span class="signature-placeholder">Sign here ✍</span>
+                    </div>
+                    <div class="signature-controls">
+                        <span class="signature-label">Draw your signature above</span>
+                        <button type="button" class="signature-clear-btn" onclick="clearSignature('${field.name}')">CLEAR</button>
+                    </div>
+                    <input type="hidden" name="${field.name}" id="sigData_${field.name}" class="signature-input" ${field.required ? 'required' : ''}>
+                </div>`;
             } else if (field.type === 'textarea') {
                 html += `<textarea class="form-textarea" name="${field.name}" rows="3" ${field.required ? 'required' : ''}></textarea>`;
             } else if (field.type === 'date') {
@@ -1686,13 +1923,200 @@
             } else if (field.type === 'number') {
                 html += `<input type="number" class="form-input" name="${field.name}" step="any" ${field.required ? 'required' : ''}>`;
             } else if (field.type === 'tel') {
-                html += `<input type="tel" class="form-input" name="${field.name}" ${field.required ? 'required' : ''}>`;
+                html += `<input type="tel" class="form-input" name="${field.name}" pattern="[0-9]{9}" maxlength="9" minlength="9" placeholder="e.g. 099725620" title="Phone number must be exactly 9 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)" ${field.required ? 'required' : ''}>`;
             } else {
-                html += `<input type="text" class="form-input" name="${field.name}" ${field.required ? 'required' : ''}>`;
+                const defaultVal = field.defaultValue ? `value="${field.defaultValue}"` : '';
+                const readonlyAttr = field.readonly ? 'readonly style="background: #e9ecef; cursor: not-allowed;"' : '';
+                html += `<input type="text" class="form-input" name="${field.name}" ${defaultVal} ${readonlyAttr} ${field.required ? 'required' : ''}>`;
             }
             
             html += '</div>';
             return html;
+        }
+
+        // Cascading dropdown handlers
+        function updateDistrictDropdown() {
+            const province = document.getElementById('cascade_province').value;
+            const districtSelect = document.getElementById('cascade_district');
+            const hfSelect = document.getElementById('cascade_hf');
+            
+            // Reset district and health facility
+            districtSelect.innerHTML = '<option value="">Select District...</option>';
+            hfSelect.innerHTML = '<option value="">Select Health Facility...</option>';
+            hfSelect.disabled = true;
+            
+            if (province) {
+                const districts = getDistrictsByProvince(province);
+                districts.forEach(d => {
+                    districtSelect.innerHTML += `<option value="${d}">${d}</option>`;
+                });
+                districtSelect.disabled = false;
+            } else {
+                districtSelect.disabled = true;
+            }
+        }
+
+        function updateHealthFacilityDropdown() {
+            const province = document.getElementById('cascade_province').value;
+            const district = document.getElementById('cascade_district').value;
+            const hfSelect = document.getElementById('cascade_hf');
+            
+            // Reset health facility
+            hfSelect.innerHTML = '<option value="">Select Health Facility...</option>';
+            
+            if (province && district) {
+                const facilities = getHealthFacilitiesByDistrict(province, district);
+                facilities.forEach(f => {
+                    hfSelect.innerHTML += `<option value="${f}">${f}</option>`;
+                });
+                hfSelect.disabled = false;
+            } else {
+                hfSelect.disabled = true;
+            }
+        }
+
+        // ============================================
+        // SIGNATURE PAD
+        // ============================================
+        const signaturePads = {};
+
+        function initSignaturePad(fieldName) {
+            const canvas = document.getElementById(`sigPad_${fieldName}`);
+            if (!canvas || signaturePads[fieldName]) return; // Already initialized
+            
+            const wrapper = document.getElementById(`sigWrapper_${fieldName}`);
+            const container = canvas.closest('.signature-container');
+            
+            // Set canvas size
+            const containerWidth = container ? container.offsetWidth : 300;
+            canvas.width = Math.max(containerWidth - 4, 280);
+            canvas.height = 150;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#000080';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+            
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                
+                let clientX, clientY;
+                if (e.touches && e.touches.length > 0) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                
+                return {
+                    x: (clientX - rect.left) * scaleX,
+                    y: (clientY - rect.top) * scaleY
+                };
+            }
+            
+            function onStart(e) {
+                e.preventDefault();
+                isDrawing = true;
+                const pos = getPos(e);
+                lastX = pos.x;
+                lastY = pos.y;
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                wrapper.classList.add('has-signature');
+            }
+            
+            function onMove(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+                lastX = pos.x;
+                lastY = pos.y;
+            }
+            
+            function onEnd(e) {
+                if (isDrawing) {
+                    isDrawing = false;
+                    saveSignature(fieldName);
+                }
+            }
+            
+            // Mouse events
+            canvas.addEventListener('mousedown', onStart);
+            canvas.addEventListener('mousemove', onMove);
+            canvas.addEventListener('mouseup', onEnd);
+            canvas.addEventListener('mouseleave', onEnd);
+            
+            // Touch events
+            canvas.addEventListener('touchstart', onStart, { passive: false });
+            canvas.addEventListener('touchmove', onMove, { passive: false });
+            canvas.addEventListener('touchend', onEnd);
+            canvas.addEventListener('touchcancel', onEnd);
+            
+            signaturePads[fieldName] = { canvas, ctx, wrapper };
+            console.log('Signature pad initialized:', fieldName);
+        }
+
+        function saveSignature(fieldName) {
+            const canvas = document.getElementById(`sigPad_${fieldName}`);
+            const input = document.getElementById(`sigData_${fieldName}`);
+            if (canvas && input) {
+                input.value = canvas.toDataURL('image/png');
+            }
+        }
+
+        function clearSignature(fieldName) {
+            const pad = signaturePads[fieldName];
+            if (pad) {
+                pad.ctx.clearRect(0, 0, pad.canvas.width, pad.canvas.height);
+                pad.wrapper.classList.remove('has-signature');
+                document.getElementById(`sigData_${fieldName}`).value = '';
+            }
+        }
+
+        function initAllSignaturePads() {
+            // Find all signature canvases and initialize them
+            const canvases = document.querySelectorAll('.signature-pad');
+            console.log('Found signature canvases:', canvases.length);
+            canvases.forEach(canvas => {
+                const fieldName = canvas.id.replace('sigPad_', '');
+                console.log('Initializing signature pad:', fieldName);
+                initSignaturePad(fieldName);
+            });
+        }
+
+        // Re-initialize signature pads when section becomes visible
+        function reinitVisibleSignaturePads() {
+            const activeSection = document.querySelector('.form-section.active');
+            if (activeSection) {
+                activeSection.querySelectorAll('.signature-pad').forEach(canvas => {
+                    const fieldName = canvas.id.replace('sigPad_', '');
+                    const pad = signaturePads[fieldName];
+                    if (pad) {
+                        // Resize canvas if needed
+                        const container = canvas.closest('.signature-container');
+                        const containerWidth = container ? container.offsetWidth : 300;
+                        if (canvas.width !== containerWidth - 4) {
+                            canvas.width = Math.max(containerWidth - 4, 280);
+                            pad.ctx.strokeStyle = '#000080';
+                            pad.ctx.lineWidth = 2;
+                            pad.ctx.lineCap = 'round';
+                            pad.ctx.lineJoin = 'round';
+                        }
+                    }
+                });
+            }
         }
 
         // ============================================
@@ -1705,6 +2129,8 @@
                 document.querySelector(`.form-section[data-section="${state.currentSection}"]`).classList.add('active');
                 updateProgress();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Reinit signature pads in newly visible section
+                setTimeout(() => reinitVisibleSignaturePads(), 100);
             }
         }
 
@@ -1715,6 +2141,8 @@
                 document.querySelector(`.form-section[data-section="${state.currentSection}"]`).classList.add('active');
                 updateProgress();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Reinit signature pads in newly visible section
+                setTimeout(() => reinitVisibleSignaturePads(), 100);
             }
         }
 
@@ -1898,7 +2326,7 @@
                     <div class="voucher-patient-id">${patientId}</div>
                     <div class="voucher-qr-container" id="qr_day${day}"></div>
                     <div class="voucher-day-label">DAY ${day}</div>
-                    <div class="voucher-info-small">${patient.patientName || '---'}<br>${patient.healthCentre || '---'}</div>
+                    <div class="voucher-info-small">${patient.patientName || '---'}<br>HF: ${patient.healthCentre || '---'}</div>
                 </div>`;
             });
             
@@ -1906,7 +2334,7 @@
             
             CONFIG.FOLLOW_UP_DAYS.forEach((day) => {
                 const qrContainer = document.getElementById(`qr_day${day}`);
-                const qrData = JSON.stringify({ id: patientId, day: day, name: patient.patientName, hc: patient.healthCentre });
+                const qrData = JSON.stringify({ id: patientId, day: day, name: patient.patientName, hf: patient.healthCentre });
                 new QRCode(qrContainer, { text: qrData, width: 80, height: 80, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
             });
             
