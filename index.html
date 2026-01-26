@@ -1483,13 +1483,33 @@
                 }
             },
             
-            // CORS Proxies - Apps Script proxy FIRST, then fallbacks
-            CORS_PROXIES: [
-                'YOUR_APPS_SCRIPT_PROXY_URL',              // Your Google Apps Script proxy (primary)
-                'https://corsproxy.io/?',
-                'https://api.allorigins.win/raw?url=',
-                'https://cors-anywhere.herokuapp.com/',
-                'https://proxy.cors.sh/'
+            // CORS Proxies - Multiple proxies for DHIS2 connection fallback
+            PROXIES: [
+                { 
+                    name: 'Direct',
+                    url: '',
+                    type: 'direct'  // Try direct connection first (works if DHIS2 has CORS enabled)
+                },
+                { 
+                    name: 'GAS Proxy',
+                    url: 'https://script.google.com/macros/s/AKfycbwC9lJdYj4askujDNO2GfK-Rqq02VBcr90NXhifgvpawboEK1YCyUfbi2GA2hFL2UghkA/exec',
+                    type: 'gas'
+                },
+                {
+                    name: 'CORS Proxy 1',
+                    url: 'https://corsproxy.io/?',
+                    type: 'cors'
+                },
+                {
+                    name: 'CORS Proxy 2', 
+                    url: 'https://api.allorigins.win/raw?url=',
+                    type: 'cors'
+                },
+                {
+                    name: 'CORS Proxy 3',
+                    url: 'https://cors-anywhere.herokuapp.com/',
+                    type: 'cors'
+                }
             ]
         };
 
@@ -3974,22 +3994,49 @@
             return Object.values(CONFIG.DHIS2.ORG_UNITS).filter(uid => uid && !uid.startsWith('xxxxxxx'));
         }
 
+        // Build proxy URL based on proxy type
+        function buildProxyUrl(proxy, targetUrl, auth, method) {
+            if (proxy.type === 'direct') {
+                return targetUrl; // Direct connection
+            } else if (proxy.type === 'gas') {
+                let proxyUrl = proxy.url + '?url=' + encodeURIComponent(targetUrl);
+                if (auth) {
+                    proxyUrl += '&auth=' + encodeURIComponent(auth);
+                }
+                if (method && method !== 'GET') {
+                    proxyUrl += '&method=' + method;
+                }
+                return proxyUrl;
+            } else {
+                // CORS proxy type
+                return proxy.url + encodeURIComponent(targetUrl);
+            }
+        }
+
         // DHIS2 API call with automatic proxy fallback
         async function dhis2Fetch(endpoint, options = {}) {
-            const url = CONFIG.DHIS2.SERVER_URL + endpoint;
-            const headers = {
-                'Authorization': 'Basic ' + btoa(CONFIG.DHIS2.USERNAME + ':' + CONFIG.DHIS2.PASSWORD),
+            const targetUrl = CONFIG.DHIS2.SERVER_URL + endpoint;
+            const auth = btoa(CONFIG.DHIS2.USERNAME + ':' + CONFIG.DHIS2.PASSWORD);
+            const method = options.method || 'GET';
+            
+            const baseHeaders = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             };
-            
-            const fetchOptions = { ...options, headers: { ...headers, ...options.headers } };
 
             // Try with current working proxy first (if we found one before)
-            if (dhis2State.currentProxyIndex >= 0) {
+            if (dhis2State.currentProxyIndex >= 0 && dhis2State.currentProxyIndex < CONFIG.PROXIES.length) {
                 try {
-                    const proxy = CONFIG.CORS_PROXIES[dhis2State.currentProxyIndex];
-                    const proxyUrl = proxy.includes('?') ? proxy + encodeURIComponent(url) : proxy + url;
+                    const proxy = CONFIG.PROXIES[dhis2State.currentProxyIndex];
+                    const proxyUrl = buildProxyUrl(proxy, targetUrl, auth, method);
+                    
+                    const fetchOptions = {
+                        ...options,
+                        headers: proxy.type === 'gas' 
+                            ? { ...baseHeaders, ...options.headers }
+                            : { ...baseHeaders, 'Authorization': 'Basic ' + auth, ...options.headers }
+                    };
+                    
                     const response = await fetch(proxyUrl, fetchOptions);
                     if (response.ok || response.status < 500) return response;
                 } catch (e) {
@@ -3997,34 +4044,36 @@
                 }
             }
 
-            // Try direct connection first
-            try {
-                const response = await fetch(url, { ...fetchOptions, mode: 'cors' });
-                if (response.ok || response.status < 500) {
-                    dhis2State.currentProxyIndex = -1;
-                    return response;
-                }
-            } catch (e) {
-                console.log('Direct connection failed');
-            }
-
-            // Try each proxy
-            for (let i = 0; i < CONFIG.CORS_PROXIES.length; i++) {
+            // Try each proxy in order
+            for (let i = 0; i < CONFIG.PROXIES.length; i++) {
+                const proxy = CONFIG.PROXIES[i];
+                
                 try {
-                    const proxy = CONFIG.CORS_PROXIES[i];
-                    if (proxy === 'YOUR_APPS_SCRIPT_PROXY_URL') continue; // Skip placeholder
+                    console.log(`Trying ${proxy.name}...`);
+                    const proxyUrl = buildProxyUrl(proxy, targetUrl, auth, method);
                     
-                    const proxyUrl = proxy.includes('?') ? proxy + encodeURIComponent(url) : proxy + url;
-                    console.log(`Trying proxy ${i + 1}: ${proxy.substring(0, 30)}...`);
+                    // For GAS proxy, auth is passed as parameter, not header
+                    const fetchOptions = {
+                        ...options,
+                        headers: proxy.type === 'gas' 
+                            ? { ...baseHeaders, ...options.headers }
+                            : { ...baseHeaders, 'Authorization': 'Basic ' + auth, ...options.headers }
+                    };
+                    
+                    // For direct connection, add CORS mode
+                    if (proxy.type === 'direct') {
+                        fetchOptions.mode = 'cors';
+                    }
                     
                     const response = await fetch(proxyUrl, fetchOptions);
+                    
                     if (response.ok || response.status < 500) {
                         dhis2State.currentProxyIndex = i;
-                        console.log(`Proxy ${i + 1} working!`);
+                        console.log(`✅ ${proxy.name} working!`);
                         return response;
                     }
                 } catch (e) {
-                    console.log(`Proxy ${i + 1} failed`);
+                    console.log(`❌ ${proxy.name} failed:`, e.message);
                 }
             }
             
