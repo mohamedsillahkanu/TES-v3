@@ -917,10 +917,10 @@
         .btn-submit:hover:not(:disabled) { background: #218838; border-color: #218838; }
         .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* VOUCHER MODAL - 10 Voucher Grid for PDF */
+        /* VOUCHER MODAL - 4 Vouchers on A4 (2x2 Grid) */
         .voucher-modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             display: none; justify-content: center; align-items: flex-start;
             z-index: 3000; padding: 20px; overflow-y: auto;
         }
@@ -931,133 +931,204 @@
             max-width: 900px;
             width: 100%;
             margin: 20px auto;
-            border: 4px solid #004080;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
         .voucher-header {
             background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
             color: #ffffff;
-            padding: 18px 25px;
+            padding: 15px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-radius: 8px 8px 0 0;
         }
-        .voucher-title { font-size: 18px; font-weight: 700; letter-spacing: 1px; }
-        .voucher-close { background: none; border: none; color: #ffffff; font-size: 28px; cursor: pointer; transition: transform 0.2s; }
+        .voucher-title { font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+        .voucher-close { background: none; border: none; color: #ffffff; font-size: 28px; cursor: pointer; }
         .voucher-close:hover { transform: scale(1.2); }
-        .voucher-content { padding: 25px; background: #f5f7fa; }
+        .voucher-content { padding: 20px; background: #e9ecef; }
         
-        /* Voucher Page Container */
-        .voucher-page {
+        /* A4 Page Container */
+        .voucher-a4-page {
             background: #ffffff;
-            border: 3px solid #004080;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 8mm;
+            margin: 0 auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-sizing: border-box;
         }
-        .voucher-page-header {
-            text-align: center;
-            padding-bottom: 15px;
-            border-bottom: 3px double #004080;
-            margin-bottom: 20px;
-        }
-        .voucher-page-logo { width: 70px; margin-bottom: 10px; border-radius: 8px; }
-        .voucher-page-title {
-            font-size: 16px; font-weight: 700; color: #004080;
-            margin-bottom: 5px; letter-spacing: 1px;
-        }
-        .voucher-page-subtitle { font-size: 12px; color: #666; }
-        .voucher-page-patient {
-            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
-            color: #ffffff;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .voucher-page-patient-id { font-size: 22px; font-weight: 700; }
-        .voucher-page-patient-info { font-size: 11px; text-align: right; }
         
-        /* 10 Voucher Grid */
-        .vouchers-grid {
+        /* 2x2 Grid */
+        .voucher-grid-2x2 {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 6mm;
+            height: calc(297mm - 16mm);
         }
-        .voucher-card {
+        
+        /* Individual Voucher Card */
+        .voucher-card-mini {
             border: 2px solid #004080;
             border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .voucher-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,64,128,0.2);
-        }
-        .voucher-card-header {
-            background: #004080;
-            color: #ffffff;
-            padding: 6px 8px;
-            margin: -10px -10px 10px -10px;
-            border-radius: 6px 6px 0 0;
-            font-size: 13px;
-            font-weight: 700;
-        }
-        .voucher-card-header.day-0 { background: #28a745; }
-        .voucher-qr-container {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             background: #ffffff;
-            padding: 8px;
-            border-radius: 6px;
-            display: inline-block;
-            border: 1px solid #dee2e6;
-        }
-        .voucher-qr-container canvas { display: block; }
-        .voucher-day-label {
-            margin-top: 8px;
-            font-size: 10px;
-            color: #666;
-            font-weight: 600;
-        }
-        .voucher-info-small {
-            margin-top: 6px;
-            font-size: 9px;
-            color: #888;
-            padding-top: 6px;
-            border-top: 1px dashed #dee2e6;
         }
         
-        /* Voucher Footer */
-        .voucher-page-footer {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid #004080;
+        /* Card Header */
+        .voucher-mini-header {
+            background: linear-gradient(135deg, #004080 0%, #0055aa 100%);
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .voucher-mini-logo {
+            width: 50px;
+            height: 50px;
+            background: #ffffff;
+            padding: 4px;
+            flex-shrink: 0;
+            border-radius: 6px;
+        }
+        .voucher-mini-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .voucher-mini-title {
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.3;
+            text-align: left;
+        }
+        .voucher-mini-title span {
+            display: block;
+            font-size: 8px;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        
+        /* Patient ID Section */
+        .voucher-mini-id {
+            background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .voucher-mini-id-label {
+            font-size: 8px;
+            color: #664d00;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .voucher-mini-id-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #000000;
+            letter-spacing: 2px;
+        }
+        
+        /* Card Body - Info then QR below */
+        .voucher-mini-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 12px;
+        }
+        
+        /* Info Section */
+        .voucher-mini-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .voucher-mini-field {
+            background: #f8f9fa;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border-left: 3px solid #004080;
+            text-align: left;
+        }
+        .voucher-mini-field.full-width {
+            grid-column: 1 / -1;
+        }
+        .voucher-mini-field-label {
+            font-size: 7px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: left;
+        }
+        .voucher-mini-field-value {
+            font-size: 11px;
+            font-weight: 700;
+            color: #004080;
+            word-break: break-word;
+            line-height: 1.3;
+            text-align: left;
+        }
+        
+        /* QR Section - Below info, centered but larger */
+        .voucher-mini-qr {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0;
+            border-top: 1px dashed #dee2e6;
+            margin-top: auto;
+        }
+        .voucher-mini-qr-box {
+            padding: 8px;
+            background: #ffffff;
+            border: 2px solid #004080;
+            border-radius: 8px;
+        }
+        .voucher-mini-qr-box canvas {
+            display: block;
+        }
+        .voucher-mini-qr-text {
+            font-size: 7px;
+            color: #666;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Card Footer */
+        .voucher-mini-footer {
+            background: #004080;
+            padding: 6px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 10px;
-            color: #666;
         }
-        .voucher-page-footer-left { text-align: left; }
-        .voucher-page-footer-right { text-align: right; color: #004080; font-weight: 600; }
+        .voucher-mini-footer-text {
+            font-size: 7px;
+            color: rgba(255,255,255,0.8);
+            text-align: left;
+        }
+        .voucher-mini-footer-days {
+            font-size: 7px;
+            color: #ffc107;
+            font-weight: 600;
+        }
         
         /* Voucher Buttons */
         .voucher-buttons { 
             display: flex; 
-            gap: 15px; 
+            gap: 12px; 
             margin-top: 20px;
             justify-content: center;
         }
         .voucher-btn {
-            padding: 14px 35px; 
-            border-radius: 8px;
-            font-size: 14px; 
+            padding: 14px 30px; 
+            border-radius: 10px;
+            font-size: 13px; 
             font-weight: 700; 
             cursor: pointer;
             font-family: 'Oswald', Arial, sans-serif;
@@ -1073,18 +1144,16 @@
             color: #ffffff; 
         }
         .voucher-btn.pdf:hover { 
-            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(220,53,69,0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(220,53,69,0.4);
         }
         .voucher-btn.print { 
-            background: linear-gradient(135deg, #004080 0%, #0066cc 100%); 
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%); 
             color: #ffffff; 
         }
         .voucher-btn.print:hover { 
-            background: linear-gradient(135deg, #0056b3 0%, #0077dd 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,64,128,0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(40,167,69,0.4);
         }
         .voucher-btn.close-btn { 
             background: #6c757d; 
@@ -1092,19 +1161,35 @@
         }
         .voucher-btn.close-btn:hover { 
             background: #5a6268;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
         }
         
         @media print {
             body * { visibility: hidden; }
-            .voucher-page, .voucher-page * { visibility: visible; }
-            .voucher-page { position: absolute; left: 0; top: 0; width: 100%; }
-            .voucher-buttons { display: none; }
+            .voucher-a4-page, .voucher-a4-page * { visibility: visible; }
+            .voucher-a4-page { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 8mm;
+                box-shadow: none;
+            }
+            .voucher-buttons, .voucher-header, .voucher-content { display: none !important; }
         }
         
-        @media (max-width: 768px) {
-            .vouchers-grid { grid-template-columns: repeat(2, 1fr); }
-            .voucher-container { max-width: 100%; margin: 10px; }
+        @media (max-width: 900px) {
+            .voucher-a4-page {
+                width: 100%;
+                min-height: auto;
+                padding: 15px;
+            }
+            .voucher-grid-2x2 {
+                height: auto;
+                gap: 15px;
+            }
         }
 
         /* QR SCANNER */
@@ -1449,42 +1534,20 @@
         </div>
     </div>
 
-    <!-- VOUCHER MODAL - 10 Voucher Grid for PDF -->
+    <!-- VOUCHER MODAL - 4 Vouchers on A4 (2x2 Grid) -->
     <div class="voucher-modal" id="voucherModal">
         <div class="voucher-container">
             <div class="voucher-header">
-                <span class="voucher-title">🎫 PATIENT VOUCHERS (10 DAYS)</span>
+                <span class="voucher-title">🎫 PATIENT VOUCHERS (4 per page)</span>
                 <button class="voucher-close" onclick="closeVoucherModal()">&times;</button>
             </div>
             <div class="voucher-content">
-                <div class="voucher-page" id="voucherPage">
-                    <div class="voucher-page-header">
-                        <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="Logo" class="voucher-page-logo">
-                        <div class="voucher-page-title">THERAPEUTIC EFFICACY STUDY 2026</div>
-                        <div class="voucher-page-subtitle">National Malaria Control Programme - Sierra Leone</div>
-                    </div>
-                    <div class="voucher-page-patient">
-                        <div class="voucher-page-patient-id" id="voucherPatientId">---</div>
-                        <div class="voucher-page-patient-info">
-                            <div id="voucherPatientName">---</div>
-                            <div id="voucherPatientHC">---</div>
-                            <div id="voucherPatientDate">---</div>
-                        </div>
-                    </div>
-                    <div class="vouchers-grid" id="vouchersGrid">
-                        <!-- 10 voucher cards will be generated here -->
-                    </div>
-                    <div class="voucher-page-footer">
-                        <div class="voucher-page-footer-left">
-                            <div>Follow-up Days: 0, 1, 2, 3, 7, 14, 21, 28, 35, 42</div>
-                            <div>Present this voucher at each visit</div>
-                        </div>
-                        <div class="voucher-page-footer-right">
-                            <div>ICF-SL © 2026</div>
-                            <div>Scan QR for verification</div>
-                        </div>
+                <div class="voucher-a4-page" id="voucherA4Page">
+                    <div class="voucher-grid-2x2" id="voucherGrid">
+                        <!-- 4 voucher cards will be generated here -->
                     </div>
                 </div>
+                
                 <div class="voucher-buttons">
                     <button class="voucher-btn pdf" onclick="downloadVoucherPDF()">📄 DOWNLOAD PDF</button>
                     <button class="voucher-btn print" onclick="printVouchers()">🖨️ PRINT</button>
@@ -3055,6 +3118,8 @@
                     patientName: data.patient_name,
                     healthCentre: data.health_centre_name,
                     district: data.district,
+                    dateOfBirth: data.date_of_birth || '',
+                    address: data.address_landmark || '',
                     enrollmentDate: data.date_of_visit || new Date().toISOString().split('T')[0],
                     screeningDate: data.date_of_visit || new Date().toISOString().split('T')[0],
                     ageYears: data.estimated_age_years || 0,
@@ -3164,57 +3229,95 @@
             const patient = state.patients[patientId];
             if (!patient) return;
             
-            // Populate header fields
-            document.getElementById('voucherPatientId').textContent = patientId;
-            document.getElementById('voucherPatientName').textContent = patient.patientName || '---';
-            document.getElementById('voucherPatientHC').textContent = patient.healthCentre || '---';
-            document.getElementById('voucherPatientDate').textContent = patient.enrollmentDate || '---';
-            
-            // Define all 10 follow-up days
-            const followUpDays = [0, 1, 2, 3, 7, 14, 21, 28, 35, 42];
-            
-            // Generate 10 voucher cards with QR codes
-            const grid = document.getElementById('vouchersGrid');
+            // Generate 4 identical voucher cards
+            const grid = document.getElementById('voucherGrid');
             grid.innerHTML = '';
             
-            followUpDays.forEach((day, index) => {
+            for (let i = 0; i < 4; i++) {
                 const card = document.createElement('div');
-                card.className = 'voucher-card';
-                
-                const headerClass = day === 0 ? 'voucher-card-header day-0' : 'voucher-card-header';
-                const dayLabel = day === 0 ? 'ENROLLMENT' : `Day ${day}`;
+                card.className = 'voucher-card-mini';
                 
                 card.innerHTML = `
-                    <div class="${headerClass}">${dayLabel}</div>
-                    <div class="voucher-qr-container" id="qr_day_${day}"></div>
-                    <div class="voucher-day-label">${patient.patientName ? patient.patientName.split(' ')[0] : patientId}</div>
-                    <div class="voucher-info-small">${patient.healthCentre ? patient.healthCentre.substring(0, 15) : '---'}</div>
+                    <!-- Header -->
+                    <div class="voucher-mini-header">
+                        <div class="voucher-mini-logo">
+                            <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="Logo">
+                        </div>
+                        <div class="voucher-mini-title">
+                            TES 2026 - SIERRA LEONE
+                            <span>National Malaria Control Programme</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Patient ID -->
+                    <div class="voucher-mini-id">
+                        <div class="voucher-mini-id-label">Patient ID</div>
+                        <div class="voucher-mini-id-value">${patientId}</div>
+                    </div>
+                    
+                    <!-- Body - Info fields then QR below -->
+                    <div class="voucher-mini-body">
+                        <div class="voucher-mini-info">
+                            <div class="voucher-mini-field full-width">
+                                <div class="voucher-mini-field-label">Patient Name</div>
+                                <div class="voucher-mini-field-value">${patient.patientName || '---'}</div>
+                            </div>
+                            <div class="voucher-mini-field">
+                                <div class="voucher-mini-field-label">Date of Birth</div>
+                                <div class="voucher-mini-field-value">${patient.dateOfBirth || '---'}</div>
+                            </div>
+                            <div class="voucher-mini-field">
+                                <div class="voucher-mini-field-label">Age</div>
+                                <div class="voucher-mini-field-value">${patient.ageDisplay || (patient.ageInMonths ? patient.ageInMonths + ' months' : '---')}</div>
+                            </div>
+                            <div class="voucher-mini-field full-width">
+                                <div class="voucher-mini-field-label">Health Facility</div>
+                                <div class="voucher-mini-field-value">${patient.healthCentre || '---'}</div>
+                            </div>
+                            <div class="voucher-mini-field full-width">
+                                <div class="voucher-mini-field-label">Address / Landmark</div>
+                                <div class="voucher-mini-field-value">${patient.address || '---'}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- QR Code - Bigger, centered below -->
+                        <div class="voucher-mini-qr">
+                            <div class="voucher-mini-qr-box" id="qr_${i}"></div>
+                            <div class="voucher-mini-qr-text">Scan QR Code to Verify</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="voucher-mini-footer">
+                        <div class="voucher-mini-footer-text">Present at each visit • ICF-SL © 2026</div>
+                        <div class="voucher-mini-footer-days">Days: 1,2,3,7,14,21,28,35,42</div>
+                    </div>
                 `;
                 
                 grid.appendChild(card);
                 
-                // Generate QR code for this day
+                // Generate bigger QR code for this card
                 setTimeout(() => {
-                    const qrContainer = document.getElementById(`qr_day_${day}`);
+                    const qrContainer = document.getElementById(`qr_${i}`);
                     if (qrContainer) {
                         const qrData = JSON.stringify({
                             id: patientId,
-                            day: day,
-                            hc: patient.healthCentre,
-                            name: patient.patientName
+                            name: patient.patientName,
+                            hf: patient.healthCentre,
+                            dob: patient.dateOfBirth
                         });
                         
                         new QRCode(qrContainer, {
                             text: qrData,
-                            width: 80,
-                            height: 80,
+                            width: 100,
+                            height: 100,
                             colorDark: "#004080",
                             colorLight: "#ffffff",
                             correctLevel: QRCode.CorrectLevel.M
                         });
                     }
-                }, index * 50); // Stagger QR code generation
-            });
+                }, i * 100);
+            }
             
             document.getElementById('voucherModal').classList.add('show');
         }
@@ -3229,46 +3332,43 @@
         }
 
         async function downloadVoucherPDF() {
-            const patientId = document.getElementById('voucherPatientId').textContent;
+            const patientId = document.querySelector('.voucher-mini-id-value')?.textContent || 'Unknown';
             
             showNotification('Generating PDF...', 'info');
             
             try {
-                const voucherPage = document.getElementById('voucherPage');
+                const voucherPage = document.getElementById('voucherA4Page');
                 
-                // Capture the voucher page as canvas
+                // Capture the A4 page as canvas
                 const canvas = await html2canvas(voucherPage, {
                     scale: 2,
                     useCORS: true,
                     allowTaint: true,
                     backgroundColor: '#ffffff',
-                    logging: false
+                    logging: false,
+                    width: voucherPage.scrollWidth,
+                    height: voucherPage.scrollHeight
                 });
                 
                 const imgData = canvas.toDataURL('image/png');
                 
-                // Create PDF with jsPDF
+                // Create PDF with jsPDF - A4 size
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({
-                    orientation: 'landscape',
+                    orientation: 'portrait',
                     unit: 'mm',
                     format: 'a4'
                 });
                 
-                // Calculate dimensions to fit A4 landscape
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
-                const imgWidth = canvas.width;
-                const imgHeight = canvas.height;
+                // A4 dimensions: 210mm x 297mm
+                const pdfWidth = 210;
+                const pdfHeight = 297;
                 
-                const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-                const imgX = (pdfWidth - imgWidth * ratio) / 2;
-                const imgY = 5;
-                
-                pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                // Add image to fit A4
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
                 
                 // Save PDF
-                pdf.save(`TES_Voucher_${patientId}.pdf`);
+                pdf.save(`TES_Vouchers_${patientId}.pdf`);
                 
                 showNotification('PDF downloaded successfully!', 'success');
             } catch (error) {
