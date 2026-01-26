@@ -1446,9 +1446,9 @@
             // DHIS2 CONFIGURATION - UPDATE THESE VALUES
             // ========================================
             DHIS2: {
-                SERVER_URL: 'https://icf-nmdr.onrender.com',         // Your DHIS2 server URL
-                USERNAME: 'admin',                    // DHIS2 API username
-                PASSWORD: 'SajeedIslam@2025',                 // DHIS2 API password
+                SERVER_URL: 'https://sl.dhis2.org',         // Your DHIS2 server URL
+                USERNAME: 'tes_api_user',                    // DHIS2 API username
+                PASSWORD: 'YourPassword123',                 // DHIS2 API password
                 DATASET_CODE: 'TES_2026_SL',
                 DATASET_NAME: 'TES 2026 - Therapeutic Efficacy Study',
                 PROGRAM_CODE: 'TES_2026_TRACKER',            // For case-based/tracker
@@ -1457,7 +1457,7 @@
                 // UPDATE THESE WITH YOUR ACTUAL DHIS2 ORG UNIT UIDs
                 ORG_UNITS: {
                     // Northern Province
-                    'Badala MCHP': 'OjSFCxiZL7l',
+                    'Kabala Government Hospital': 'xxxxxxx01',
                     'Makeni Government Hospital': 'xxxxxxx02',
                     'Magburaka Government Hospital': 'xxxxxxx03',
                     'Falaba District Hospital': 'xxxxxxx04',
@@ -1670,8 +1670,9 @@
                 description: 'Patient demographic information',
                 fields: [
                     { name: 'date_of_birth', label: 'Date of birth (dd-mmm-yyyy)', type: 'date', required: false },
-                    { name: 'estimated_age', label: 'or estimated age', type: 'number', required: false },
-                    { name: 'age_unit', label: 'in:', type: 'checkbox_group', options: ['months', 'years'], required: false },
+                    { name: 'estimated_age_years', label: 'Estimated age - Years', type: 'number', required: false },
+                    { name: 'estimated_age_months', label: 'Estimated age - Months', type: 'number', required: false },
+                    { name: 'age_display', label: 'Age (auto-calculated)', type: 'text', required: false, readonly: true },
                     { name: 'weight_kg', label: 'Weight (kg)', type: 'number', required: true },
                     { name: 'sex', label: 'Sex', type: 'checkbox_group', options: ['Male', 'Female'], required: true }
                 ]
@@ -2155,6 +2156,8 @@
                 // Clear existing pads first
                 Object.keys(signaturePads).forEach(key => delete signaturePads[key]);
                 initAllSignaturePads();
+                // Setup age calculator
+                setupAgeCalculator();
             }, 200);
         }
 
@@ -2212,11 +2215,21 @@
             } else if (field.type === 'textarea') {
                 html += `<textarea class="form-textarea" name="${field.name}" rows="3" ${field.required ? 'required' : ''}></textarea>`;
             } else if (field.type === 'date') {
-                html += `<input type="date" class="form-input" name="${field.name}" ${field.required ? 'required' : ''}>`;
+                // Special handling for date_of_birth to auto-calculate age
+                if (field.name === 'date_of_birth') {
+                    html += `<input type="date" class="form-input" name="${field.name}" onchange="autoCalculateAge(this.value)" ${field.required ? 'required' : ''}>`;
+                } else {
+                    html += `<input type="date" class="form-input" name="${field.name}" ${field.required ? 'required' : ''}>`;
+                }
             } else if (field.type === 'time') {
                 html += `<input type="time" class="form-input" name="${field.name}" ${field.required ? 'required' : ''}>`;
             } else if (field.type === 'number') {
-                html += `<input type="number" class="form-input" name="${field.name}" step="any" ${field.required ? 'required' : ''}>`;
+                // Special handling for age fields to update display
+                if (field.name === 'estimated_age_years' || field.name === 'estimated_age_months') {
+                    html += `<input type="number" class="form-input" name="${field.name}" min="0" oninput="updateAgeDisplay()" ${field.required ? 'required' : ''}>`;
+                } else {
+                    html += `<input type="number" class="form-input" name="${field.name}" step="any" ${field.required ? 'required' : ''}>`;
+                }
             } else if (field.type === 'tel') {
                 html += `<input type="tel" class="form-input" name="${field.name}" pattern="[0-9]{9}" maxlength="9" minlength="9" placeholder="e.g. 099725620" title="Phone number must be exactly 9 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)" ${field.required ? 'required' : ''}>`;
             } else {
@@ -2227,6 +2240,120 @@
             
             html += '</div>';
             return html;
+        }
+
+        // Automatic Age Calculator from Date of Birth
+        function calculateAgeFromDOB(dob) {
+            if (!dob) return null;
+            
+            const birthDate = new Date(dob);
+            const today = new Date();
+            
+            let years = today.getFullYear() - birthDate.getFullYear();
+            let months = today.getMonth() - birthDate.getMonth();
+            
+            // Adjust if day of month hasn't passed yet
+            if (today.getDate() < birthDate.getDate()) {
+                months--;
+            }
+            
+            // Adjust if months is negative
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+            
+            // Calculate total months for eligibility check
+            const totalMonths = (years * 12) + months;
+            
+            return {
+                years: Math.max(0, years),
+                months: Math.max(0, months),
+                totalMonths: Math.max(0, totalMonths)
+            };
+        }
+
+        // Auto-calculate age when DOB is entered (called from onchange)
+        function autoCalculateAge(dobValue) {
+            const age = calculateAgeFromDOB(dobValue);
+            if (age !== null) {
+                // Update years field
+                const yearsField = document.querySelector('input[name="estimated_age_years"]');
+                if (yearsField) {
+                    yearsField.value = age.years;
+                }
+                
+                // Update months field
+                const monthsField = document.querySelector('input[name="estimated_age_months"]');
+                if (monthsField) {
+                    monthsField.value = age.months;
+                }
+                
+                // Update display field with combined format
+                const displayField = document.querySelector('input[name="age_display"]');
+                if (displayField) {
+                    let ageText = '';
+                    if (age.years > 0) {
+                        ageText += `${age.years} year${age.years !== 1 ? 's' : ''}`;
+                    }
+                    if (age.months > 0) {
+                        if (ageText) ageText += ', ';
+                        ageText += `${age.months} month${age.months !== 1 ? 's' : ''}`;
+                    }
+                    if (!ageText) ageText = '0 months';
+                    ageText += ` (${age.totalMonths} months total)`;
+                    displayField.value = ageText;
+                }
+                
+                // Show notification
+                showNotification(`Age calculated: ${age.years} years, ${age.months} months (${age.totalMonths} months total)`, 'info');
+            }
+        }
+
+        // Update age display when years or months fields are manually changed
+        function updateAgeDisplay() {
+            const yearsField = document.querySelector('input[name="estimated_age_years"]');
+            const monthsField = document.querySelector('input[name="estimated_age_months"]');
+            const displayField = document.querySelector('input[name="age_display"]');
+            
+            if (yearsField && monthsField && displayField) {
+                const years = parseInt(yearsField.value) || 0;
+                const months = parseInt(monthsField.value) || 0;
+                const totalMonths = (years * 12) + months;
+                
+                let ageText = '';
+                if (years > 0) {
+                    ageText += `${years} year${years !== 1 ? 's' : ''}`;
+                }
+                if (months > 0) {
+                    if (ageText) ageText += ', ';
+                    ageText += `${months} month${months !== 1 ? 's' : ''}`;
+                }
+                if (!ageText) ageText = '0 months';
+                ageText += ` (${totalMonths} months total)`;
+                displayField.value = ageText;
+            }
+        }
+
+        function setupAgeCalculator() {
+            // Find the DOB field and add event listener
+            const dobField = document.querySelector('input[name="date_of_birth"]');
+            if (dobField) {
+                dobField.addEventListener('change', function() {
+                    autoCalculateAge(this.value);
+                });
+            }
+            
+            // Add listeners to years/months fields for manual entry
+            const yearsField = document.querySelector('input[name="estimated_age_years"]');
+            const monthsField = document.querySelector('input[name="estimated_age_months"]');
+            
+            if (yearsField) {
+                yearsField.addEventListener('input', updateAgeDisplay);
+            }
+            if (monthsField) {
+                monthsField.addEventListener('input', updateAgeDisplay);
+            }
         }
 
         // Cascading dropdown handlers
@@ -2507,8 +2634,9 @@
                     healthCentre: data.health_centre_name,
                     district: data.district,
                     screeningDate: data.date_of_visit || new Date().toISOString().split('T')[0],
-                    age: data.estimated_age,
-                    ageUnit: data.age_unit,
+                    ageYears: data.estimated_age_years || 0,
+                    ageMonths: data.estimated_age_months || 0,
+                    ageDisplay: data.age_display || '',
                     sex: data.sex,
                     weight: data.weight_kg,
                     screeningTemperature: data.temperature,
@@ -2791,7 +2919,7 @@
             document.getElementById('patientInfoBar').style.display = 'block';
             document.getElementById('infoPatientName').textContent = patient.patientName || '---';
             document.getElementById('infoPatientId').textContent = patientId;
-            document.getElementById('infoPatientAge').textContent = patient.age ? `${patient.age} ${patient.ageUnit || ''}` : '---';
+            document.getElementById('infoPatientAge').textContent = patient.ageDisplay || `${patient.ageYears || 0}y ${patient.ageMonths || 0}m`;
             document.getElementById('infoPatientSex').textContent = patient.sex || '---';
             document.getElementById('infoPatientWeight').textContent = patient.weight ? `${patient.weight} kg` : '---';
             document.getElementById('infoHealthCentre').textContent = patient.healthCentre || '---';
@@ -2870,7 +2998,7 @@
                         </div>
                         <div class="patient-info-grid">
                             <div class="patient-info-item"><span class="patient-info-label">NAME</span><span class="patient-info-value">${patient.patientName || '---'}</span></div>
-                            <div class="patient-info-item"><span class="patient-info-label">AGE</span><span class="patient-info-value">${patient.age || '---'} ${patient.ageUnit || ''}</span></div>
+                            <div class="patient-info-item"><span class="patient-info-label">AGE</span><span class="patient-info-value">${patient.ageDisplay || `${patient.ageYears || 0}y ${patient.ageMonths || 0}m`}</span></div>
                             <div class="patient-info-item"><span class="patient-info-label">HEALTH CENTRE</span><span class="patient-info-value">${patient.healthCentre || '---'}</span></div>
                             <div class="patient-info-item"><span class="patient-info-label">SCREENED</span><span class="patient-info-value">${patient.screeningDate || '---'}</span></div>
                         </div>
@@ -3379,7 +3507,7 @@
                             <div class="patient-info-summary">
                                 <div class="patient-info-item-sm">
                                     <div class="label">AGE</div>
-                                    <div class="value">${patient.age || '---'} ${patient.ageUnit || ''}</div>
+                                    <div class="value">${patient.ageDisplay || `${patient.ageYears || 0}y ${patient.ageMonths || 0}m`}</div>
                                 </div>
                                 <div class="patient-info-item-sm">
                                     <div class="label">SEX</div>
