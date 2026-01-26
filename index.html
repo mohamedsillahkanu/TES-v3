@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TES Case Record Forms - 42 Days Follow-up (Sierra Leone)</title>
+    <title>TES Case Record Forms - Sierra Leone 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -988,15 +988,14 @@
         .voucher-mini-logo {
             width: 50px;
             height: 50px;
-            background: #ffffff;
-            padding: 4px;
             flex-shrink: 0;
             border-radius: 6px;
+            overflow: hidden;
         }
-        .voucher-mini-logo img {
+        .voucher-mini-logo svg {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            display: block;
         }
         .voucher-mini-title {
             color: #ffffff;
@@ -1402,7 +1401,7 @@
             <div class="login-body">
                 <div class="login-content">
                     <h2 class="login-title">TES CASE RECORD FORMS</h2>
-                    <p class="login-subtitle">Therapeutic Efficacy Study<br>42 Days Follow-up - Sierra Leone 2026</p>
+                    <p class="login-subtitle">Therapeutic Efficacy Study<br>Sierra Leone 2026</p>
                     <div class="login-error" id="loginError">Invalid username or password</div>
                     <form id="loginForm">
                         <div class="login-form-group">
@@ -1433,7 +1432,7 @@
                 <h3>Study Number: SL TES 2026</h3>
                 <p class="tagline"><em>National Malaria Control Programme</em></p>
                 <h1>TES CASE RECORD FORMS</h1>
-                <p class="subtitle">42 Days Follow-up</p>
+                <p class="subtitle">Sierra Leone 2026</p>
             </div>
 
             <div class="controls-bar">
@@ -1469,7 +1468,7 @@
 
             <!-- Scan Voucher Panel (shown when Case Report Form selected) -->
             <div class="scan-panel" id="scanPanel" style="display: none;">
-                <div class="scan-panel-title">CASE REPORT FORM (Day 0-42)</div>
+                <div class="scan-panel-title">CASE REPORT FORM</div>
                 <p class="scan-panel-desc">Scan the patient's voucher to continue with follow-up</p>
                 <button class="scan-voucher-btn" onclick="openScannerModal()">SCAN VOUCHER</button>
             </div>
@@ -1673,7 +1672,7 @@
                         <ul style="font-size: 12px; color: #333; margin-left: 20px; margin-bottom: 15px;">
                             <li>✅ Tracker Program for case-based data</li>
                             <li>✅ All TES data elements (screening, follow-up, outcomes)</li>
-                            <li>✅ Program stages for Day 0-42 visits</li>
+                            <li>✅ Program stages for follow-up visits</li>
                             <li>✅ Assign to all mapped health facilities</li>
                         </ul>
                         <button class="dhis2-btn success" onclick="autoSetupDhis2()" id="autoSetupBtn" style="width: 100%; padding: 15px;">
@@ -1727,7 +1726,22 @@
             ADMIN_USERNAME: 'admin',
             ADMIN_PASSWORD: 'admin2026',
             STUDY_NUMBER: 'SL TES 2026',
-            FOLLOW_UP_DAYS: [0, 1, 2, 3, 7, 14, 21, 28, 35, 42],
+            // Medicine types with their follow-up schedules
+            MEDICINES: {
+                'AL': {
+                    name: 'Artemether-Lumefantrine (AL)',
+                    shortName: 'AL',
+                    followUpDays: [0, 1, 2, 3, 7, 14, 21, 28],
+                    maxDay: 28
+                },
+                'DHAPQ': {
+                    name: 'Dihydroartemisinin-Piperaquine (DHAPQ)',
+                    shortName: 'DHAPQ',
+                    followUpDays: [0, 1, 2, 3, 7, 14, 21, 28, 35, 42],
+                    maxDay: 42
+                }
+            },
+            FOLLOW_UP_DAYS: [0, 1, 2, 3, 7, 14, 21, 28, 35, 42], // Default (DHAPQ)
             
             // ========================================
             // DHIS2 CONFIGURATION - UPDATE THESE VALUES
@@ -1912,16 +1926,16 @@
                     { name: 'consent_parent_name', label: 'Name of Parent/Guardian (Print in full)', type: 'text', required: true },
                     { name: 'consent_parent_signature', label: 'Parent/Guardian Signature (Optional)', type: 'signature', required: false },
                     { name: 'consent_date', label: 'Date', type: 'date', required: true },
-                    { name: 'consent_parent_literate', label: 'Is the parent/guardian literate?', type: 'checkbox_group', options: ['Yes', 'No'], required: true }
+                    { name: 'consent_parent_literate', label: 'Is the parent/guardian literate?', type: 'radio_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
                 title: 'Witness (If Parent/Guardian is Illiterate)',
                 description: 'Required only if parent/guardian cannot read',
+                skipIfLiterate: true,
                 fields: [
-                    { name: 'witness_required', label: 'Witness signature required?', type: 'checkbox_group', options: ['Yes', 'No - Parent is literate'], required: true },
                     { name: 'witness_name', label: 'Witness Name (Print in full)', type: 'text', required: false },
-                    { name: 'witness_signature', label: 'Witness Signature (Optional)', type: 'signature', required: false },
+                    { name: 'witness_signature', label: 'Witness Signature', type: 'signature', required: false },
                     { name: 'witness_date', label: 'Date', type: 'date', required: false }
                 ]
             },
@@ -1968,7 +1982,7 @@
                 title: 'Pre-treatment Temperature',
                 description: 'Temperature assessment',
                 fields: [
-                    { name: 'history_of_fever_24h', label: 'History of fever in previous 24 h?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'history_of_fever_24h', label: 'History of fever in previous 24 h?', type: 'radio_group', options: ['Yes', 'No'], required: true },
                     { name: 'temperature', label: 'Temperature (°C)', type: 'number', required: true },
                     { name: 'temp_method', label: '', type: 'checkbox_group', options: ['Axillary/Infrared'], required: false }
                 ]
@@ -1978,37 +1992,37 @@
                 description: 'Thick and thin blood smears for estimation of P. falciparum parasite counts',
                 fields: [
                     { name: 'species', label: 'Species:', type: 'checkbox_group', options: ['P. falciparum', 'P. vivax', 'P. ovale', 'P. malariae'], required: true },
-                    { name: 'other_species_present', label: 'Were species other than P. falciparum present?', type: 'checkbox_group', options: ['Yes', 'No'], required: true, eligibility_note: '(If yes, patient is not eligible)' },
+                    { name: 'other_species_present', label: 'Were species other than P. falciparum present?', type: 'radio_group', options: ['Yes', 'No'], required: true, eligibility_note: '(If yes, patient is not eligible)' },
                     { name: 'approx_parasite_count', label: 'Approximate number of P. falciparum asexual parasites:', type: 'number', required: true },
-                    { name: 'parasites_1_200_per_6wbc', label: 'Presence of 1–200 parasites / 6 white blood cells?', type: 'checkbox_group', options: ['Yes', 'No'], required: true, eligibility_note: '(If no, patient is not eligible)' },
-                    { name: 'gametocytes_present', label: 'Presence of P. falciparum gametocytes?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'pcr_sample_collected', label: 'Has a blood sample for PCR been collected?', type: 'checkbox_group', options: ['Yes', 'No'], required: true }
+                    { name: 'parasites_1_200_per_6wbc', label: 'Presence of 1–200 parasites / 6 white blood cells?', type: 'radio_group', options: ['Yes', 'No'], required: true, eligibility_note: '(If no, patient is not eligible)' },
+                    { name: 'gametocytes_present', label: 'Presence of P. falciparum gametocytes?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'pcr_sample_collected', label: 'Has a blood sample for PCR been collected?', type: 'radio_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
                 title: 'Inclusion Criteria Assessment',
                 description: 'Assess each inclusion criterion - ALL must be YES for eligibility',
                 fields: [
-                    { name: 'ic_age', label: 'Age between 6 months to 59 months?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_mono_infection', label: 'Mono-infection with P. falciparum detected by microscopy?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_parasitaemia', label: 'Parasitaemia of 2,000 – 200,000/µl asexual forms?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_fever', label: 'Temperature ≥37.5°C or history of fever within the last 24 hours?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_oral_meds', label: 'Ability to swallow oral medication?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_comply', label: 'Ability and willingness to comply with study protocol?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ic_consent', label: 'Informed consent from parent/guardian obtained?', type: 'checkbox_group', options: ['Yes', 'No'], required: true }
+                    { name: 'ic_age', label: 'Age between 6 months to 59 months?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_mono_infection', label: 'Mono-infection with P. falciparum detected by microscopy?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_parasitaemia', label: 'Parasitaemia of 2,000 – 200,000/µl asexual forms?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_fever', label: 'Temperature ≥37.5°C or history of fever within the last 24 hours?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_oral_meds', label: 'Ability to swallow oral medication?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_comply', label: 'Ability and willingness to comply with study protocol?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_consent', label: 'Informed consent from parent/guardian obtained?', type: 'radio_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
                 title: 'Exclusion Criteria Assessment',
                 description: 'Assess each exclusion criterion - ANY YES means NOT eligible',
                 fields: [
-                    { name: 'ec_danger_signs', label: 'Presence of general danger signs or signs of severe falciparum malaria?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_weight_under_5kg', label: 'Weight under 5 kg?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_mixed_infection', label: 'Mixed or mono-infection with another Plasmodium species detected by microscopy?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_malnutrition', label: 'Severe malnutrition (MUAC <110mm)?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_other_febrile', label: 'Other febrile conditions (measles, acute LRTI, severe diarrhea) or known chronic/severe diseases?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_interfering_meds', label: 'Regular medication which may interfere with antimalarial pharmacokinetics?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'ec_hypersensitivity', label: 'History of hypersensitivity reactions or contraindications to test medicines?', type: 'checkbox_group', options: ['Yes', 'No'], required: true }
+                    { name: 'ec_danger_signs', label: 'Presence of general danger signs or signs of severe falciparum malaria?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_weight_under_5kg', label: 'Weight under 5 kg?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_mixed_infection', label: 'Mixed or mono-infection with another Plasmodium species detected by microscopy?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_malnutrition', label: 'Severe malnutrition (MUAC <110mm)?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_other_febrile', label: 'Other febrile conditions (measles, acute LRTI, severe diarrhea) or known chronic/severe diseases?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_interfering_meds', label: 'Regular medication which may interfere with antimalarial pharmacokinetics?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_hypersensitivity', label: 'History of hypersensitivity reactions or contraindications to test medicines?', type: 'radio_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
@@ -2021,8 +2035,8 @@
                 title: 'Patient Informed Consent and Assent',
                 description: 'Consent documentation',
                 fields: [
-                    { name: 'consent_form_signed', label: 'Consent form signed:', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'patient_identity_number', label: 'Patient identity number:', type: 'text', required: true },
+                    { name: 'consent_form_signed', label: 'Consent form signed:', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'patient_identity_number', label: 'Patient identity number:', type: 'text', required: true, readonly: true, autoGenerate: true },
                     { name: 'consent_date', label: 'Date (dd-mmm-yyyy):', type: 'date', required: true }
                 ]
             }
@@ -2043,45 +2057,47 @@
                 description: 'Thick blood smears for P. falciparum: quantitative parasite counts and qualitative gametocyte counts',
                 fields: [
                     { name: 'avg_asexual_parasites', label: 'Average number of asexual P. falciparum parasites/µl:', type: 'number', required: true },
-                    { name: 'gametocytes_present', label: 'Presence of P. falciparum gametocytes?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'other_species_present', label: 'Were species other than P. falciparum present?', type: 'checkbox_group', options: ['Yes', 'No'], required: true, eligibility_note: '(If yes, patient is not eligible)' },
-                    { name: 'other_species', label: 'If yes, which species?', type: 'checkbox_group', options: ['P. vivax', 'P. ovale', 'P. malariae'], required: false },
-                    { name: 'pcr_sample_collected', label: 'Has blood sample for PCR been collected?', type: 'checkbox_group', options: ['Yes', 'No'], required: true }
+                    { name: 'gametocytes_present', label: 'Presence of P. falciparum gametocytes?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'other_species_present', label: 'Were species other than P. falciparum present?', type: 'radio_group', options: ['Yes', 'No'], required: true, eligibility_note: '(If yes, patient is not eligible)' },
+                    { name: 'other_species', label: 'If yes, which species?', type: 'checkbox_group', options: ['P. vivax', 'P. ovale', 'P. malariae'], required: false, showIf: { field: 'other_species_present', value: 'Yes' } },
+                    { name: 'pcr_sample_collected', label: 'Has blood sample for PCR been collected?', type: 'radio_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
                 title: 'Prior Medication',
                 description: 'All prior medication, including natural remedies and homeopathic medicines, taken within the previous 14 days should be reported in this section.',
                 fields: [
-                    { name: 'prior_antimalarial', label: 'Has the patient taken any prior antimalarial medication?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'prior_med_1_name', label: 'Medicine name (generic name)', type: 'text', required: false },
-                    { name: 'prior_med_1_start', label: 'Start date', type: 'date', required: false },
-                    { name: 'prior_med_1_stop', label: 'Stop date', type: 'date', required: false },
-                    { name: 'prior_med_1_ongoing', label: 'Ongoing', type: 'checkbox_single', required: false },
-                    { name: 'prior_med_1_dose', label: 'Total daily dose and unit (e.g. 400 mg)', type: 'text', required: false },
-                    { name: 'prior_med_1_route', label: 'Route of administration', type: 'text', required: false },
-                    { name: 'prior_med_1_indication', label: 'Indication for use', type: 'text', required: false }
+                    { name: 'prior_antimalarial', label: 'Has the patient taken any prior antimalarial medication?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'prior_med_1_name', label: 'Medicine name (generic name)', type: 'text', required: false, showIf: { field: 'prior_antimalarial', value: 'Yes' } },
+                    { name: 'prior_med_1_start', label: 'Start date', type: 'date', required: false, showIf: { field: 'prior_antimalarial', value: 'Yes' } },
+                    { name: 'prior_med_1_stop', label: 'Stop date', type: 'date', required: false, showIf: { field: 'prior_antimalarial', value: 'Yes' } },
+                    { name: 'prior_med_1_ongoing', label: 'Ongoing', type: 'checkbox_single', required: false, showIf: { field: 'prior_antimalarial', value: 'Yes' } },
+                    { name: 'prior_med_1_dose', label: 'Total daily dose and unit (e.g. 400 mg)', type: 'text', required: false, showIf: { field: 'prior_antimalarial', value: 'Yes' } },
+                    { name: 'prior_med_1_route', label: 'Route of administration', type: 'text', required: false, showIf: { field: 'prior_antimalarial', value: 'Yes' } },
+                    { name: 'prior_med_1_indication', label: 'Indication for use', type: 'text', required: false, showIf: { field: 'prior_antimalarial', value: 'Yes' } }
                 ]
             },
             {
-                title: 'Medication Administration',
-                description: 'Record medication given',
+                title: 'Medication Administration - Day 0',
+                description: 'Select study medicine and record doses given',
                 fields: [
-                    { name: 'antimalarial_dose1_name', label: 'Name(s) of antimalarial drug(s) - Dose 1', type: 'text', required: false },
-                    { name: 'dose1_time', label: 'Time of dose (hh:min)', type: 'time', required: false },
-                    { name: 'dose1_tablets', label: 'Number of tablets', type: 'number', required: false },
-                    { name: 'dose1_vomit', label: 'Did the patient vomit?', type: 'checkbox_group', options: ['Yes', 'No'], required: false },
-                    { name: 'dose1_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false },
-                    { name: 'antimalarial_dose2_name', label: 'Name(s) of antimalarial drug(s) - Dose 2', type: 'text', required: false },
-                    { name: 'dose2_time', label: 'Time of dose (hh:min)', type: 'time', required: false },
-                    { name: 'dose2_tablets', label: 'Number of tablets', type: 'number', required: false },
-                    { name: 'dose2_vomit', label: 'Did the patient vomit?', type: 'checkbox_group', options: ['Yes', 'No'], required: false },
-                    { name: 'dose2_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false },
-                    { name: 'other_med_name', label: 'Name(s) of other medicine(s)', type: 'text', required: false },
-                    { name: 'other_med_time', label: 'Time of dose (hh:min)', type: 'time', required: false },
-                    { name: 'other_med_tablets', label: 'Number of tablets', type: 'number', required: false },
-                    { name: 'other_med_vomit', label: 'Did the patient vomit?', type: 'checkbox_group', options: ['Yes', 'No'], required: false },
-                    { name: 'other_med_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false }
+                    { name: 'study_medicine', label: 'Study Medicine', type: 'select', options: ['-- Select Medicine --', 'AL', 'DHAPQ'], required: true, note: 'AL = 28 days follow-up, DHAPQ = 42 days follow-up' },
+                    { name: 'antimalarial_dose1_name', label: 'Name of antimalarial drug - Dose 1', type: 'text', required: true, readonly: true, prefillFromMedicine: true },
+                    { name: 'dose1_time', label: 'Time of Dose 1 (hh:min)', type: 'time', required: true },
+                    { name: 'dose1_tablets', label: 'Number of tablets - Dose 1', type: 'select', options: ['-- Select --', '1', '2', '3', '4', '5', '6'], required: true },
+                    { name: 'dose1_vomit', label: 'Did the patient vomit after Dose 1?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'dose1_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false, showIf: { field: 'dose1_vomit', value: 'Yes' } },
+                    { name: 'antimalarial_dose2_name', label: 'Name of antimalarial drug - Dose 2', type: 'text', required: true, readonly: true, prefillFromMedicine: true },
+                    { name: 'dose2_time', label: 'Time of Dose 2 (hh:min) - Auto: 8hrs after Dose 1', type: 'time', required: true, autoCalculate8hrs: true },
+                    { name: 'dose2_tablets', label: 'Number of tablets - Dose 2', type: 'select', options: ['-- Select --', '1', '2', '3', '4', '5', '6'], required: true },
+                    { name: 'dose2_vomit', label: 'Did the patient vomit after Dose 2?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'dose2_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false, showIf: { field: 'dose2_vomit', value: 'Yes' } },
+                    { name: 'other_med_given', label: 'Was any other medicine given?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'other_med_name', label: 'Name(s) of other medicine(s)', type: 'text', required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_time', label: 'Time of dose (hh:min)', type: 'time', required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_tablets', label: 'Number of tablets', type: 'select', options: ['-- Select --', '1', '2', '3', '4', '5', '6'], required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_vomit', label: 'Did the patient vomit?', type: 'radio_group', options: ['Yes', 'No'], required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false, showIf: { field: 'other_med_vomit', value: 'Yes' } }
                 ]
             }
         ];
@@ -2093,7 +2109,7 @@
                 description: 'Current clinical assessment',
                 fields: [
                     { name: 'visit_date', label: 'Date of visit (dd-mmm-yyyy)', type: 'date', required: true },
-                    { name: 'danger_signs_present', label: 'Presence of danger signs or signs of severe or complicated malaria?', type: 'checkbox_group', options: ['Yes', 'No'], required: true, note: 'If yes, perform thick blood smear.' },
+                    { name: 'danger_signs_present', label: 'Presence of danger signs or signs of severe or complicated malaria?', type: 'radio_group', options: ['Yes', 'No'], required: true, note: 'If yes, perform thick blood smear.' },
                     { name: 'temperature', label: 'Temperature (°C)', type: 'number', required: true },
                     { name: 'temp_method', label: '', type: 'checkbox_group', options: ['Axillary/Infrared'], required: false }
                 ]
@@ -2103,39 +2119,40 @@
                 description: 'Thick blood smears for estimation of P. falciparum parasite counts',
                 fields: [
                     { name: 'avg_asexual_parasites', label: 'Average number of asexual P. falciparum parasites/µl:', type: 'number', required: true },
-                    { name: 'gametocytes_present', label: 'Presence of P. falciparum gametocytes?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'other_species_present', label: 'Were species other than P. falciparum present?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'other_species', label: 'If yes, which species?', type: 'checkbox_group', options: ['P. vivax', 'P. ovale', 'P. malariae'], required: false }
+                    { name: 'gametocytes_present', label: 'Presence of P. falciparum gametocytes?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'other_species_present', label: 'Were species other than P. falciparum present?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'other_species', label: 'If yes, which species?', type: 'checkbox_group', options: ['P. vivax', 'P. ovale', 'P. malariae'], required: false, showIf: { field: 'other_species_present', value: 'Yes' } }
                 ]
             },
             {
                 title: 'Adverse Events',
                 description: 'Report any adverse events',
                 fields: [
-                    { name: 'adverse_event_present', label: 'Presence of an adverse event?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'adverse_event_name', label: 'If yes, name the adverse event:', type: 'text', required: false },
-                    { name: 'serious_adverse_event', label: 'Is it a serious adverse event?', type: 'checkbox_group', options: ['Yes', 'No'], required: false, note: 'If yes, inform the PI.' }
+                    { name: 'adverse_event_present', label: 'Presence of an adverse event?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'adverse_event_name', label: 'If yes, name the adverse event:', type: 'text', required: false, showIf: { field: 'adverse_event_present', value: 'Yes' } },
+                    { name: 'serious_adverse_event', label: 'Is it a serious adverse event?', type: 'radio_group', options: ['Yes', 'No'], required: false, showIf: { field: 'adverse_event_present', value: 'Yes' }, note: 'If yes, inform the PI.' }
                 ]
             },
             {
                 title: 'Medication Administration',
                 description: 'Record medication given',
                 fields: [
-                    { name: 'antimalarial_dose1_name', label: 'Name(s) of antimalarial drug(s) - Dose 1', type: 'text', required: false },
-                    { name: 'dose1_time', label: 'Time of dose (hh:min)', type: 'time', required: false },
-                    { name: 'dose1_tablets', label: 'Number of tablets', type: 'number', required: false },
-                    { name: 'dose1_vomit', label: 'Did the patient vomit?', type: 'checkbox_group', options: ['Yes', 'No'], required: false },
-                    { name: 'dose1_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false },
-                    { name: 'antimalarial_dose2_name', label: 'Name(s) of antimalarial drug(s) - Dose 2', type: 'text', required: false },
-                    { name: 'dose2_time', label: 'Time of dose (hh:min)', type: 'time', required: false },
-                    { name: 'dose2_tablets', label: 'Number of tablets', type: 'number', required: false },
-                    { name: 'dose2_vomit', label: 'Did the patient vomit?', type: 'checkbox_group', options: ['Yes', 'No'], required: false },
-                    { name: 'dose2_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false },
-                    { name: 'other_med_name', label: 'Name(s) of other medicine(s)', type: 'text', required: false },
-                    { name: 'other_med_time', label: 'Time of dose (hh:min)', type: 'time', required: false },
-                    { name: 'other_med_tablets', label: 'Number of tablets', type: 'number', required: false },
-                    { name: 'other_med_vomit', label: 'Did the patient vomit?', type: 'checkbox_group', options: ['Yes', 'No'], required: false },
-                    { name: 'other_med_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false }
+                    { name: 'antimalarial_dose1_name', label: 'Name of antimalarial drug - Dose 1', type: 'text', required: true, readonly: true, prefillFromMedicine: true },
+                    { name: 'dose1_time', label: 'Time of Dose 1 (hh:min)', type: 'time', required: true },
+                    { name: 'dose1_tablets', label: 'Number of tablets - Dose 1', type: 'select', options: ['-- Select --', '1', '2', '3', '4', '5', '6'], required: true },
+                    { name: 'dose1_vomit', label: 'Did the patient vomit after Dose 1?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'dose1_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false, showIf: { field: 'dose1_vomit', value: 'Yes' } },
+                    { name: 'antimalarial_dose2_name', label: 'Name of antimalarial drug - Dose 2', type: 'text', required: true, readonly: true, prefillFromMedicine: true },
+                    { name: 'dose2_time', label: 'Time of Dose 2 (hh:min) - Auto: 8hrs after Dose 1', type: 'time', required: true, autoCalculate8hrs: true },
+                    { name: 'dose2_tablets', label: 'Number of tablets - Dose 2', type: 'select', options: ['-- Select --', '1', '2', '3', '4', '5', '6'], required: true },
+                    { name: 'dose2_vomit', label: 'Did the patient vomit after Dose 2?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'dose2_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false, showIf: { field: 'dose2_vomit', value: 'Yes' } },
+                    { name: 'other_med_given', label: 'Was any other medicine given?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'other_med_name', label: 'Name(s) of other medicine(s)', type: 'text', required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_time', label: 'Time of dose (hh:min)', type: 'time', required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_tablets', label: 'Number of tablets', type: 'select', options: ['-- Select --', '1', '2', '3', '4', '5', '6'], required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_vomit', label: 'Did the patient vomit?', type: 'radio_group', options: ['Yes', 'No'], required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false, showIf: { field: 'other_med_vomit', value: 'Yes' } }
                 ]
             }
         ];
@@ -2148,8 +2165,8 @@
                 description: 'Current clinical assessment',
                 fields: [
                     { name: 'visit_date', label: 'Date of visit (dd-mmm-yyyy)', type: 'date', required: true },
-                    { name: 'danger_signs_present', label: 'Presence of danger signs or signs of severe or complicated malaria?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'history_of_fever_24h', label: 'History of fever within previous 24 h?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
+                    { name: 'danger_signs_present', label: 'Presence of danger signs or signs of severe or complicated malaria?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'history_of_fever_24h', label: 'History of fever within previous 24 h?', type: 'radio_group', options: ['Yes', 'No'], required: true },
                     { name: 'temperature', label: 'Temperature (°C)', type: 'number', required: true },
                     { name: 'temp_method', label: '', type: 'checkbox_group', options: ['Axillary/Infrared'], required: false }
                 ]
@@ -2159,40 +2176,31 @@
                 description: 'Thick blood smears for estimation of P. falciparum parasite counts',
                 fields: [
                     { name: 'avg_asexual_parasites', label: 'Average number of asexual P. falciparum parasites/µl:', type: 'number', required: true },
-                    { name: 'gametocytes_present', label: 'Presence of P. falciparum gametocytes?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'other_species_present', label: 'Were species other than P. falciparum present?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'other_species', label: 'If yes, which species?', type: 'checkbox_group', options: ['P. vivax', 'P. ovale', 'P. malariae'], required: false },
-                    { name: 'pcr_sample_collected', label: 'Has a blood sample for PCR been collected?', type: 'checkbox_group', options: ['Yes', 'No'], required: true }
+                    { name: 'gametocytes_present', label: 'Presence of P. falciparum gametocytes?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'other_species_present', label: 'Were species other than P. falciparum present?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'other_species', label: 'If yes, which species?', type: 'checkbox_group', options: ['P. vivax', 'P. ovale', 'P. malariae'], required: false, showIf: { field: 'other_species_present', value: 'Yes' } },
+                    { name: 'pcr_sample_collected', label: 'Has a blood sample for PCR been collected?', type: 'radio_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
                 title: 'Adverse Events',
                 description: 'Report any adverse events',
                 fields: [
-                    { name: 'adverse_event_present', label: 'Presence of an adverse event?', type: 'checkbox_group', options: ['Yes', 'No'], required: true },
-                    { name: 'adverse_event_name', label: 'If yes, name the adverse event:', type: 'text', required: false },
-                    { name: 'serious_adverse_event', label: 'Is it a serious adverse event?', type: 'checkbox_group', options: ['Yes', 'No'], required: false, note: 'If yes, inform the PI.' }
+                    { name: 'adverse_event_present', label: 'Presence of an adverse event?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'adverse_event_name', label: 'If yes, name the adverse event:', type: 'text', required: false, showIf: { field: 'adverse_event_present', value: 'Yes' } },
+                    { name: 'serious_adverse_event', label: 'Is it a serious adverse event?', type: 'radio_group', options: ['Yes', 'No'], required: false, showIf: { field: 'adverse_event_present', value: 'Yes' }, note: 'If yes, inform the PI.' }
                 ]
             },
             {
-                title: 'Medication Administration',
-                description: 'Record medication given',
+                title: 'Concomitant Medication',
+                description: 'Record any other medication given',
                 fields: [
-                    { name: 'antimalarial_dose1_name', label: 'Name(s) of antimalarial drug(s) - Dose 1', type: 'text', required: false },
-                    { name: 'dose1_time', label: 'Time of dose (hh:min)', type: 'time', required: false },
-                    { name: 'dose1_tablets', label: 'Number of tablets', type: 'number', required: false },
-                    { name: 'dose1_vomit', label: 'Did the patient vomit?', type: 'checkbox_group', options: ['Yes', 'No'], required: false },
-                    { name: 'dose1_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false },
-                    { name: 'antimalarial_dose2_name', label: 'Name(s) of antimalarial drug(s) - Dose 2', type: 'text', required: false },
-                    { name: 'dose2_time', label: 'Time of dose (hh:min)', type: 'time', required: false },
-                    { name: 'dose2_tablets', label: 'Number of tablets', type: 'number', required: false },
-                    { name: 'dose2_vomit', label: 'Did the patient vomit?', type: 'checkbox_group', options: ['Yes', 'No'], required: false },
-                    { name: 'dose2_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false },
-                    { name: 'other_med_name', label: 'Name(s) of other medicine(s)', type: 'text', required: false },
-                    { name: 'other_med_time', label: 'Time of dose (hh:min)', type: 'time', required: false },
-                    { name: 'other_med_tablets', label: 'Number of tablets', type: 'number', required: false },
-                    { name: 'other_med_vomit', label: 'Did the patient vomit?', type: 'checkbox_group', options: ['Yes', 'No'], required: false },
-                    { name: 'other_med_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false }
+                    { name: 'other_med_given', label: 'Was any other medicine given?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'other_med_name', label: 'Name(s) of other medicine(s)', type: 'text', required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_time', label: 'Time of dose (hh:min)', type: 'time', required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_tablets', label: 'Number of tablets', type: 'select', options: ['-- Select --', '1', '2', '3', '4', '5', '6'], required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_vomit', label: 'Did the patient vomit?', type: 'radio_group', options: ['Yes', 'No'], required: false, showIf: { field: 'other_med_given', value: 'Yes' } },
+                    { name: 'other_med_vomit_time', label: 'Time of vomiting (hh:min)', type: 'time', required: false, showIf: { field: 'other_med_vomit', value: 'Yes' } }
                 ]
             }
         ];
@@ -2484,17 +2492,39 @@
                 setupAgeCalculator();
                 // Setup eligibility calculator listeners
                 setupEligibilityCalculator();
+                // Setup conditional visibility
+                setupConditionalVisibility();
+                // Setup medicine selection
+                setupMedicineSelection();
+                // Auto-fill IDs
+                autoFillIds();
             }, 200);
         }
 
         function generateField(field) {
-            let html = '<div class="form-group">';
+            // Add data attributes for conditional visibility
+            let showIfAttr = '';
+            if (field.showIf) {
+                showIfAttr = `data-show-if-field="${field.showIf.field}" data-show-if-value="${field.showIf.value}" style="display: none;"`;
+            }
+            
+            let html = `<div class="form-group" ${showIfAttr}>`;
             html += `<label class="form-label">${field.label.toUpperCase()} ${field.required ? '<span class="required">*</span>' : ''}`;
             if (field.eligibility_note) html += `<span class="eligibility-note">${field.eligibility_note}</span>`;
             if (field.note) html += `<span class="eligibility-note">${field.note}</span>`;
             html += '</label>';
             
-            if (field.type === 'checkbox_group') {
+            // Radio group for Yes/No questions (mutually exclusive)
+            if (field.type === 'radio_group') {
+                html += '<div class="checkbox-group">';
+                field.options.forEach((option, idx) => {
+                    html += `<div class="checkbox-item">
+                        <input type="radio" name="${field.name}" id="${field.name}_${idx}" value="${option}" ${field.required ? 'required' : ''}>
+                        <label for="${field.name}_${idx}">${option}</label>
+                    </div>`;
+                });
+                html += '</div>';
+            } else if (field.type === 'checkbox_group') {
                 html += '<div class="checkbox-group">';
                 field.options.forEach((option, idx) => {
                     html += `<div class="checkbox-item">
@@ -2509,10 +2539,17 @@
                     <label for="${field.name}">Yes</label>
                 </div>`;
             } else if (field.type === 'select') {
-                html += `<select class="form-select" name="${field.name}" ${field.required ? 'required' : ''}>
-                    <option value="">Select...</option>
-                    ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-                </select>`;
+                // Handle different select options
+                const selectId = field.name === 'study_medicine' ? 'id="study_medicine_select"' : '';
+                html += `<select class="form-select" name="${field.name}" ${selectId} ${field.required ? 'required' : ''}>`;
+                field.options.forEach(opt => {
+                    if (opt.startsWith('--')) {
+                        html += `<option value="">${opt}</option>`;
+                    } else {
+                        html += `<option value="${opt}">${opt}</option>`;
+                    }
+                });
+                html += '</select>';
             } else if (field.type === 'cascade_province') {
                 html += `<select class="form-select" name="${field.name}" id="cascade_province" onchange="updateDistrictDropdown()" ${field.required ? 'required' : ''}>
                     <option value="">Select Province...</option>
@@ -2548,7 +2585,14 @@
                     html += `<input type="date" class="form-input" name="${field.name}" ${field.required ? 'required' : ''}>`;
                 }
             } else if (field.type === 'time') {
-                html += `<input type="time" class="form-input" name="${field.name}" ${field.required ? 'required' : ''}>`;
+                // Special handling for dose1_time to auto-calculate dose2_time
+                if (field.name === 'dose1_time') {
+                    html += `<input type="time" class="form-input" name="${field.name}" id="dose1_time_input" onchange="calculateDose2Time(this.value)" ${field.required ? 'required' : ''}>`;
+                } else if (field.name === 'dose2_time' && field.autoCalculate8hrs) {
+                    html += `<input type="time" class="form-input" name="${field.name}" id="dose2_time_input" ${field.required ? 'required' : ''}>`;
+                } else {
+                    html += `<input type="time" class="form-input" name="${field.name}" ${field.required ? 'required' : ''}>`;
+                }
             } else if (field.type === 'number') {
                 // Special handling for age fields to update display
                 if (field.name === 'estimated_age_years' || field.name === 'estimated_age_months') {
@@ -2561,7 +2605,12 @@
             } else {
                 const defaultVal = field.defaultValue ? `value="${field.defaultValue}"` : '';
                 const readonlyAttr = field.readonly ? 'readonly style="background: #e9ecef; cursor: not-allowed;"' : '';
-                html += `<input type="text" class="form-input" name="${field.name}" ${defaultVal} ${readonlyAttr} ${field.required ? 'required' : ''}>`;
+                // Special handling for antimalarial drug name fields
+                let extraId = '';
+                if (field.name === 'antimalarial_dose1_name' || field.name === 'antimalarial_dose2_name') {
+                    extraId = `id="${field.name}_input"`;
+                }
+                html += `<input type="text" class="form-input" name="${field.name}" ${extraId} ${defaultVal} ${readonlyAttr} ${field.required ? 'required' : ''}>`;
             }
             
             html += '</div>';
@@ -2680,6 +2729,196 @@
             if (monthsField) {
                 monthsField.addEventListener('input', updateAgeDisplay);
             }
+        }
+
+        // ============================================
+        // AUTO ID GENERATION
+        // ============================================
+        function generateScreeningId() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const mins = String(date.getMinutes()).padStart(2, '0');
+            const secs = String(date.getSeconds()).padStart(2, '0');
+            return `TES-${year}${month}${day}-${hours}${mins}${secs}`;
+        }
+        
+        function generatePatientId(healthFacility) {
+            const date = new Date();
+            const year = date.getFullYear();
+            // Create facility code from first 3 letters
+            const facilityCode = (healthFacility || 'UNK').substring(0, 3).toUpperCase();
+            const sequential = Object.keys(state.patients).length + 1;
+            return `${facilityCode}-${String(sequential).padStart(3, '0')}-${year}`;
+        }
+        
+        function autoFillIds() {
+            // Auto-fill patient identity number (screening ID)
+            const screeningIdField = document.querySelector('input[name="patient_identity_number"]');
+            if (screeningIdField && !screeningIdField.value) {
+                screeningIdField.value = generateScreeningId();
+                screeningIdField.readOnly = true;
+                screeningIdField.style.backgroundColor = '#e9ecef';
+                screeningIdField.style.cursor = 'not-allowed';
+            }
+            
+            // Patient ID is generated when patient is selected or form submitted
+        }
+
+        // ============================================
+        // CONDITIONAL VISIBILITY (showIf)
+        // ============================================
+        function setupConditionalVisibility() {
+            // Find all checkbox groups and selects that control visibility
+            document.querySelectorAll('input[type="checkbox"], input[type="radio"], select').forEach(input => {
+                input.addEventListener('change', handleConditionalVisibility);
+            });
+            
+            // Initial check
+            handleConditionalVisibility();
+        }
+        
+        function handleConditionalVisibility() {
+            // Find all fields with showIf conditions
+            document.querySelectorAll('[data-show-if-field]').forEach(formGroup => {
+                const triggerField = formGroup.dataset.showIfField;
+                const triggerValue = formGroup.dataset.showIfValue;
+                
+                // Check if the trigger field has the expected value
+                const triggerInputs = document.querySelectorAll(`input[name="${triggerField}"], select[name="${triggerField}"]`);
+                let currentValue = '';
+                
+                triggerInputs.forEach(input => {
+                    if ((input.type === 'checkbox' || input.type === 'radio') && input.checked) {
+                        currentValue = input.value;
+                    } else if (input.type !== 'checkbox' && input.type !== 'radio' && input.value) {
+                        currentValue = input.value;
+                    }
+                });
+                
+                // Show or hide based on condition
+                if (currentValue === triggerValue) {
+                    formGroup.style.display = 'block';
+                    // Make inputs required if they were originally required
+                    formGroup.querySelectorAll('input, select, textarea').forEach(inp => {
+                        if (inp.dataset.wasRequired === 'true') {
+                            inp.required = true;
+                        }
+                    });
+                } else {
+                    formGroup.style.display = 'none';
+                    // Remove required attribute when hidden
+                    formGroup.querySelectorAll('input, select, textarea').forEach(inp => {
+                        if (inp.required) {
+                            inp.dataset.wasRequired = 'true';
+                        }
+                        inp.required = false;
+                    });
+                }
+            });
+        }
+
+        // ============================================
+        // DOSE 2 TIME CALCULATION (8 hours after Dose 1)
+        // ============================================
+        function calculateDose2Time(dose1Time) {
+            if (!dose1Time) return;
+            
+            // Parse dose 1 time
+            const [hours, minutes] = dose1Time.split(':').map(Number);
+            
+            // Add 8 hours
+            let dose2Hours = hours + 8;
+            let dose2Minutes = minutes;
+            
+            // Handle overflow past midnight
+            if (dose2Hours >= 24) {
+                dose2Hours = dose2Hours - 24;
+            }
+            
+            // Format as HH:MM
+            const dose2Time = `${String(dose2Hours).padStart(2, '0')}:${String(dose2Minutes).padStart(2, '0')}`;
+            
+            // Update dose 2 time field
+            const dose2Field = document.querySelector('input[name="dose2_time"]');
+            if (dose2Field) {
+                dose2Field.value = dose2Time;
+            }
+        }
+
+        // ============================================
+        // MEDICINE SELECTION HANDLING
+        // ============================================
+        function setupMedicineSelection() {
+            const medicineSelect = document.querySelector('select[name="study_medicine"]');
+            if (medicineSelect) {
+                medicineSelect.addEventListener('change', handleMedicineChange);
+            }
+        }
+        
+        function handleMedicineChange(e) {
+            const selectedMedicine = e.target.value;
+            if (!selectedMedicine || selectedMedicine.startsWith('--')) return;
+            
+            const medicineConfig = CONFIG.MEDICINES[selectedMedicine];
+            if (!medicineConfig) return;
+            
+            // Update follow-up days for this patient
+            state.patientMedicine = selectedMedicine;
+            state.patientFollowUpDays = medicineConfig.followUpDays;
+            
+            // Prefill antimalarial drug names
+            const dose1NameField = document.querySelector('input[name="antimalarial_dose1_name"]');
+            const dose2NameField = document.querySelector('input[name="antimalarial_dose2_name"]');
+            
+            if (dose1NameField) {
+                dose1NameField.value = medicineConfig.name;
+            }
+            if (dose2NameField) {
+                dose2NameField.value = medicineConfig.name;
+            }
+            
+            // Update follow-up day buttons
+            updateFollowUpDayButtons(medicineConfig.followUpDays);
+            
+            showNotification(`Selected ${medicineConfig.name}. Follow-up: Days ${medicineConfig.followUpDays.join(', ')} (${medicineConfig.maxDay} days total)`, 'info');
+        }
+        
+        function updateFollowUpDayButtons(allowedDays) {
+            // Update the day selection buttons based on medicine
+            const dayButtons = document.querySelectorAll('.day-btn');
+            dayButtons.forEach(btn => {
+                const day = parseInt(btn.dataset.day);
+                if (allowedDays.includes(day)) {
+                    btn.style.display = 'inline-flex';
+                    btn.disabled = false;
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+        }
+        
+        function prefillMedicineForFollowUp(patientId) {
+            const patient = state.patients[patientId];
+            if (!patient || !patient.studyMedicine) return;
+            
+            const medicineConfig = CONFIG.MEDICINES[patient.studyMedicine];
+            if (!medicineConfig) return;
+            
+            // Prefill medicine names in follow-up forms
+            setTimeout(() => {
+                const dose1NameField = document.querySelector('input[name="antimalarial_dose1_name"]');
+                const dose2NameField = document.querySelector('input[name="antimalarial_dose2_name"]');
+                
+                if (dose1NameField) {
+                    dose1NameField.value = medicineConfig.name;
+                }
+                if (dose2NameField) {
+                    dose2NameField.value = medicineConfig.name;
+                }
+            }, 100);
         }
 
         // ============================================
@@ -3017,10 +3256,37 @@
         // ============================================
         // NAVIGATION
         // ============================================
+        function shouldSkipWitnessSection() {
+            // Check if parent is literate - if Yes, skip witness section
+            const literateCheckbox = document.querySelector('input[name="consent_parent_literate"]:checked');
+            return literateCheckbox && literateCheckbox.value === 'Yes';
+        }
+        
+        function isWitnessSection(sectionNum) {
+            // Check if the section title contains "Witness"
+            const section = document.querySelector(`.form-section[data-section="${sectionNum}"]`);
+            if (section) {
+                const title = section.querySelector('.section-title');
+                return title && title.textContent.toLowerCase().includes('witness');
+            }
+            return false;
+        }
+        
         function nextSection() {
             if (state.currentSection < state.totalSections) {
                 document.querySelector(`.form-section[data-section="${state.currentSection}"]`).classList.remove('active');
                 state.currentSection++;
+                
+                // Skip witness section if parent is literate
+                if (isWitnessSection(state.currentSection) && shouldSkipWitnessSection()) {
+                    state.currentSection++;
+                }
+                
+                // Make sure we don't go past the last section
+                if (state.currentSection > state.totalSections) {
+                    state.currentSection = state.totalSections;
+                }
+                
                 document.querySelector(`.form-section[data-section="${state.currentSection}"]`).classList.add('active');
                 updateProgress();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3033,6 +3299,17 @@
             if (state.currentSection > 1) {
                 document.querySelector(`.form-section[data-section="${state.currentSection}"]`).classList.remove('active');
                 state.currentSection--;
+                
+                // Skip witness section if parent is literate (going backwards)
+                if (isWitnessSection(state.currentSection) && shouldSkipWitnessSection()) {
+                    state.currentSection--;
+                }
+                
+                // Make sure we don't go below 1
+                if (state.currentSection < 1) {
+                    state.currentSection = 1;
+                }
+                
                 document.querySelector(`.form-section[data-section="${state.currentSection}"]`).classList.add('active');
                 updateProgress();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3136,6 +3413,16 @@
                 if (!state.patients[patientId].completedDays.includes(day)) {
                     state.patients[patientId].completedDays.push(day);
                     state.patients[patientId].completedDays.sort((a, b) => a - b);
+                }
+                
+                // Store medicine selection from Day 0
+                if (day === 0 && data.study_medicine) {
+                    state.patients[patientId].studyMedicine = data.study_medicine;
+                    const medicineConfig = CONFIG.MEDICINES[data.study_medicine];
+                    if (medicineConfig) {
+                        state.patients[patientId].followUpDays = medicineConfig.followUpDays;
+                        state.patients[patientId].maxFollowUpDay = medicineConfig.maxDay;
+                    }
                 }
             }
             
@@ -3241,7 +3528,12 @@
                     <!-- Header -->
                     <div class="voucher-mini-header">
                         <div class="voucher-mini-logo">
-                            <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="Logo">
+                            <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="50" height="50" fill="#004080" rx="4"/>
+                                <text x="25" y="20" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="bold" font-family="Arial">ICF</text>
+                                <text x="25" y="32" text-anchor="middle" fill="#ffc107" font-size="8" font-weight="bold" font-family="Arial">SL</text>
+                                <text x="25" y="44" text-anchor="middle" fill="#ffffff" font-size="6" font-family="Arial">2026</text>
+                            </svg>
                         </div>
                         <div class="voucher-mini-title">
                             TES 2026 - SIERRA LEONE
@@ -3289,8 +3581,8 @@
                     
                     <!-- Footer -->
                     <div class="voucher-mini-footer">
-                        <div class="voucher-mini-footer-text">Present at each visit • ICF-SL © 2026</div>
-                        <div class="voucher-mini-footer-days">Days: 1,2,3,7,14,21,28,35,42</div>
+                        <div class="voucher-mini-footer-text">Present this voucher at each follow-up visit</div>
+                        <div class="voucher-mini-footer-days">ICF-SL © 2026</div>
                     </div>
                 `;
                 
@@ -3474,12 +3766,18 @@
             const container = document.getElementById('dayButtons');
             const completedDays = patient.completedDays || [];
             
+            // Get follow-up days based on patient's medicine (if selected)
+            let followUpDays = CONFIG.FOLLOW_UP_DAYS; // Default all days
+            if (patient.studyMedicine && CONFIG.MEDICINES[patient.studyMedicine]) {
+                followUpDays = CONFIG.MEDICINES[patient.studyMedicine].followUpDays;
+            }
+            
             let html = '';
-            CONFIG.FOLLOW_UP_DAYS.forEach((day, index) => {
+            followUpDays.forEach((day, index) => {
                 const isCompleted = completedDays.includes(day);
                 let isLocked = false;
                 if (index > 0) {
-                    const previousDay = CONFIG.FOLLOW_UP_DAYS[index - 1];
+                    const previousDay = followUpDays[index - 1];
                     isLocked = !completedDays.includes(previousDay);
                 }
                 
@@ -3488,7 +3786,7 @@
                 if (isCompleted) { className += ' completed'; disabled = 'disabled'; }
                 else if (isLocked) { className += ' locked'; disabled = 'disabled'; }
                 
-                html += `<button type="button" class="${className}" ${disabled} onclick="selectDay(${day})">D${day}</button>`;
+                html += `<button type="button" class="${className}" data-day="${day}" ${disabled} onclick="selectDay(${day})">D${day}</button>`;
             });
             container.innerHTML = html;
         }
@@ -3500,11 +3798,19 @@
             const patient = state.patients[patientId];
             const completedDays = patient.completedDays || [];
             
+            // Get follow-up days based on patient's medicine
+            let followUpDays = CONFIG.FOLLOW_UP_DAYS;
+            let maxDay = 42;
+            if (patient.studyMedicine && CONFIG.MEDICINES[patient.studyMedicine]) {
+                followUpDays = CONFIG.MEDICINES[patient.studyMedicine].followUpDays;
+                maxDay = CONFIG.MEDICINES[patient.studyMedicine].maxDay;
+            }
+            
             if (completedDays.includes(day)) { showNotification(`Day ${day} already completed`, 'warning'); return; }
             
-            const dayIndex = CONFIG.FOLLOW_UP_DAYS.indexOf(day);
+            const dayIndex = followUpDays.indexOf(day);
             if (dayIndex > 0) {
-                const previousDay = CONFIG.FOLLOW_UP_DAYS[dayIndex - 1];
+                const previousDay = followUpDays[dayIndex - 1];
                 if (!completedDays.includes(previousDay)) { showNotification(`Please complete Day ${previousDay} first`, 'error'); return; }
             }
             
@@ -3533,9 +3839,13 @@
                 sections = DAYS_1_2_SECTIONS;
             } else {
                 sections = DAYS_3_TO_42_SECTIONS.slice(); // Copy array
-                // Add final assessment for day 42
-                if (day === 42) {
-                    sections.push(DAY42_FINAL_SECTION);
+                // Add final assessment for the final day (Day 28 for AL, Day 42 for DHAPQ)
+                if (day === maxDay) {
+                    // Update the title to reflect the actual final day
+                    const finalSection = JSON.parse(JSON.stringify(DAY42_FINAL_SECTION));
+                    finalSection.title = `Overall Assessment - Final Day ${maxDay}`;
+                    finalSection.description = `Case report form: final day of follow-up ${maxDay}`;
+                    sections.push(finalSection);
                 }
             }
             
@@ -3572,6 +3882,24 @@
             const visitDateField = document.querySelector('input[name="visit_date"]');
             if (visitDateField) {
                 visitDateField.value = new Date().toISOString().split('T')[0];
+            }
+            
+            // Prefill medicine names for Days 1-2 if medicine was selected in Day 0
+            if ((day === 1 || day === 2) && patient.studyMedicine) {
+                const medicineConfig = CONFIG.MEDICINES[patient.studyMedicine];
+                if (medicineConfig) {
+                    setTimeout(() => {
+                        const dose1NameField = document.querySelector('input[name="antimalarial_dose1_name"]');
+                        const dose2NameField = document.querySelector('input[name="antimalarial_dose2_name"]');
+                        
+                        if (dose1NameField) {
+                            dose1NameField.value = medicineConfig.name;
+                        }
+                        if (dose2NameField) {
+                            dose2NameField.value = medicineConfig.name;
+                        }
+                    }, 100);
+                }
             }
         }
 
