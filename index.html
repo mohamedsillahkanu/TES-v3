@@ -2031,18 +2031,17 @@
             },
             {
                 title: 'Eligibility Summary (Auto-Calculated)',
-                description: 'Eligibility is automatically determined based on your responses above',
+                description: 'Eligibility is automatically determined based on your responses above. Informed consent is confirmed from the consent sections completed earlier.',
                 isEligibilitySummary: true,
                 isAutoCalculated: true,
                 fields: []
             },
             {
-                title: 'Patient Informed Consent and Assent',
-                description: 'Consent documentation',
+                title: 'Patient Identification',
+                description: 'Patient ID and enrollment date',
                 fields: [
-                    { name: 'consent_form_signed', label: 'Consent form signed:', type: 'radio_group', options: ['Yes', 'No'], required: true },
                     { name: 'patient_identity_number', label: 'Patient identity number:', type: 'text', required: true, readonly: true, autoGenerate: true },
-                    { name: 'consent_date', label: 'Date (dd-mmm-yyyy):', type: 'date', required: true }
+                    { name: 'enrollment_date', label: 'Enrollment date (dd-mmm-yyyy):', type: 'date', required: true }
                 ]
             }
         ];
@@ -2426,7 +2425,7 @@
                                 <div class="criteria-item pending"><span>Fever ≥37.5°C or history</span><span class="criteria-value">Enter temp</span><span class="criteria-status pending">--</span></div>
                                 <div class="criteria-item pending"><span>Able to swallow oral meds</span><span class="criteria-value">Answer above</span><span class="criteria-status pending">--</span></div>
                                 <div class="criteria-item pending"><span>Willing to comply</span><span class="criteria-value">Answer above</span><span class="criteria-status pending">--</span></div>
-                                <div class="criteria-item pending"><span>Informed consent obtained</span><span class="criteria-value">Sign consent</span><span class="criteria-status pending">--</span></div>
+                                <div class="criteria-item pending"><span>Informed consent obtained</span><span class="criteria-value">From consent section</span><span class="criteria-status pending">--</span></div>
                             </div>
                         </div>
                         
@@ -2445,6 +2444,9 @@
                         
                         <div class="eligibility-note-box">
                             <strong>📊 Auto-Calculation:</strong> Eligibility is automatically determined from your responses in previous sections.
+                            <br><br>
+                            <strong>✓ Informed consent</strong> is verified from the Consent sections completed earlier (where parent/guardian signed).
+                            <br>
                             No need to manually assess each criterion - the system calculates based on age, weight, temperature, species, parasite count, and clinical assessment answers.
                         </div>
                     </div>
@@ -2870,6 +2872,47 @@
             if (visitDateField && !visitDateField.value) {
                 visitDateField.value = new Date().toISOString().split('T')[0];
             }
+            
+            // Setup auto-fill for "other species present" based on species checkboxes
+            setupSpeciesAutoFill();
+        }
+        
+        function setupSpeciesAutoFill() {
+            // Listen to species checkbox changes
+            const speciesCheckboxes = document.querySelectorAll('input[name="species"]');
+            speciesCheckboxes.forEach(cb => {
+                cb.addEventListener('change', updateOtherSpeciesPresent);
+            });
+        }
+        
+        function updateOtherSpeciesPresent() {
+            const speciesCheckboxes = document.querySelectorAll('input[name="species"]:checked');
+            const checkedSpecies = Array.from(speciesCheckboxes).map(cb => cb.value);
+            
+            // Check if any species other than P. falciparum is selected
+            const hasOtherSpecies = checkedSpecies.some(s => s !== 'P. falciparum');
+            // Or if multiple species are selected (mixed infection)
+            const hasMixedInfection = checkedSpecies.length > 1;
+            
+            const shouldBeYes = hasOtherSpecies || hasMixedInfection;
+            
+            // Auto-select the appropriate radio button
+            const yesRadio = document.querySelector('input[name="other_species_present"][value="Yes"]');
+            const noRadio = document.querySelector('input[name="other_species_present"][value="No"]');
+            
+            if (yesRadio && noRadio) {
+                if (shouldBeYes) {
+                    yesRadio.checked = true;
+                    noRadio.checked = false;
+                } else if (checkedSpecies.length === 1 && checkedSpecies[0] === 'P. falciparum') {
+                    // Only P. falciparum selected - auto-select No
+                    yesRadio.checked = false;
+                    noRadio.checked = true;
+                }
+                // Trigger change event to update conditional visibility
+                const event = new Event('change', { bubbles: true });
+                (shouldBeYes ? yesRadio : noRadio).dispatchEvent(event);
+            }
         }
 
         // ============================================
@@ -3035,7 +3078,7 @@
                 'danger_signs_present', 'able_to_swallow', 'willing_to_comply',
                 'severe_malnutrition', 'other_febrile_conditions', 
                 'interfering_medications', 'hypersensitivity_history',
-                'consent_form_signed'
+                'consent_copy_given'
             ];
             
             // Add change listeners to all eligibility fields
@@ -3072,7 +3115,10 @@
             const otherFebrile = getRadioValue('other_febrile_conditions');
             const interferingMeds = getRadioValue('interfering_medications');
             const hypersensitivity = getRadioValue('hypersensitivity_history');
-            const consentSigned = getRadioValue('consent_form_signed');
+            
+            // Check consent from CONSENT_SECTIONS (consent_copy_given checkbox)
+            const consentCopyGiven = document.querySelector('input[name="consent_copy_given"]:checked');
+            const consentObtained = consentCopyGiven !== null;
             
             // Auto-calculate inclusion criteria
             const inclusionCriteria = [
@@ -3114,9 +3160,9 @@
                 },
                 { 
                     label: 'Informed consent obtained',
-                    met: consentSigned === 'Yes',
-                    value: consentSigned || 'Not answered',
-                    filled: consentSigned !== null
+                    met: consentObtained,
+                    value: consentObtained ? 'Yes (from consent section)' : 'Not completed',
+                    filled: true // Consent section is always checked
                 }
             ];
             
