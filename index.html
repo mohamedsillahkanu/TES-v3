@@ -681,6 +681,7 @@
             padding: 10px;
             border-radius: 6px;
             border-left: 4px solid #28a745;
+            position: relative;
         }
         .form-group.auto-filled .form-label::after {
             content: ' 🔒 (Auto-filled - Read Only)';
@@ -688,13 +689,19 @@
             font-size: 11px;
             font-weight: normal;
         }
-        .form-group.auto-filled input[type="radio"] {
-            pointer-events: none;
+        .form-group.auto-filled input[type="radio"],
+        .form-group.auto-filled input[type="checkbox"] {
+            pointer-events: none !important;
+            opacity: 0.7;
         }
-        .form-group.auto-filled input[type="radio"]:disabled + label,
-        .form-group.auto-filled .checkbox-label {
-            opacity: 0.8;
-            cursor: not-allowed;
+        .form-group.auto-filled label {
+            pointer-events: none !important;
+            cursor: not-allowed !important;
+        }
+        .form-group.auto-filled .checkbox-group,
+        .form-group.auto-filled .radio-group {
+            pointer-events: none !important;
+            opacity: 0.9;
         }
         .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
         .form-row .form-group { flex: 1; min-width: 200px; }
@@ -3165,6 +3172,8 @@
             const noRadio = document.querySelector('input[name="other_species_present"][value="No"]');
             
             if (yesRadio && noRadio) {
+                const formGroup = yesRadio.closest('.form-group');
+                
                 // Only auto-fill if at least one species is selected
                 if (checkedSpecies.length > 0) {
                     if (shouldBeYes) {
@@ -3179,29 +3188,40 @@
                     // Disable the radio buttons so user cannot change them
                     yesRadio.disabled = true;
                     noRadio.disabled = true;
+                    yesRadio.style.pointerEvents = 'none';
+                    noRadio.style.pointerEvents = 'none';
                     yesRadio.style.cursor = 'not-allowed';
                     noRadio.style.cursor = 'not-allowed';
                     
-                    // Add visual indicator for auto-filled
-                    const formGroup = yesRadio.closest('.form-group');
-                    if (formGroup && !formGroup.classList.contains('auto-filled')) {
-                        formGroup.classList.add('auto-filled');
+                    // Add visual indicator for auto-filled and disable labels
+                    if (formGroup) {
+                        if (!formGroup.classList.contains('auto-filled')) {
+                            formGroup.classList.add('auto-filled');
+                        }
+                        formGroup.querySelectorAll('label').forEach(lbl => {
+                            lbl.style.pointerEvents = 'none';
+                            lbl.style.cursor = 'not-allowed';
+                        });
                     }
                     
-                    // Trigger change event to update conditional visibility
-                    const event = new Event('change', { bubbles: true });
-                    (shouldBeYes ? yesRadio : noRadio).dispatchEvent(event);
+                    // Trigger conditional visibility update
+                    setTimeout(handleConditionalVisibility, 50);
                 } else {
                     // No species selected - enable radio buttons for manual selection
                     yesRadio.disabled = false;
                     noRadio.disabled = false;
+                    yesRadio.style.pointerEvents = 'auto';
+                    noRadio.style.pointerEvents = 'auto';
                     yesRadio.style.cursor = 'pointer';
                     noRadio.style.cursor = 'pointer';
                     
-                    // Remove auto-filled styling
-                    const formGroup = yesRadio.closest('.form-group');
+                    // Remove auto-filled styling and enable labels
                     if (formGroup) {
                         formGroup.classList.remove('auto-filled');
+                        formGroup.querySelectorAll('label').forEach(lbl => {
+                            lbl.style.pointerEvents = 'auto';
+                            lbl.style.cursor = 'pointer';
+                        });
                     }
                 }
             }
@@ -3476,18 +3496,29 @@
                     const allRadios = document.querySelectorAll(`input[name="${fieldName}"]`);
                     allRadios.forEach(r => {
                         r.disabled = true;
+                        r.style.pointerEvents = 'none';
                         r.style.cursor = 'not-allowed';
                     });
                     
-                    // Add visual indicator for auto-filled
+                    // Also disable the labels
                     const formGroup = radio.closest('.form-group');
-                    if (formGroup && !formGroup.classList.contains('auto-filled')) {
-                        formGroup.classList.add('auto-filled');
+                    if (formGroup) {
+                        if (!formGroup.classList.contains('auto-filled')) {
+                            formGroup.classList.add('auto-filled');
+                        }
+                        // Disable clicking on labels too
+                        formGroup.querySelectorAll('label').forEach(lbl => {
+                            lbl.style.pointerEvents = 'none';
+                            lbl.style.cursor = 'not-allowed';
+                        });
                     }
                 }
                 
-                // Trigger change event
-                radio.dispatchEvent(new Event('change', { bubbles: true }));
+                // Trigger change event for conditional visibility (create new event on form, not radio)
+                setTimeout(() => {
+                    handleConditionalVisibility();
+                    calculateEligibility();
+                }, 50);
             }
         }
 
