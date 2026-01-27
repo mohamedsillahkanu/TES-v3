@@ -669,7 +669,7 @@
 
         /* SECTION */
         .form-section { display: none; }
-        .form-section.active { display: block; }
+        .form-section.active { display: block; pointer-events: auto; }
         .section-header { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #004080; }
         .section-title { font-size: 16px; color: #004080; margin-bottom: 5px; }
         .section-description { font-size: 12px; }
@@ -944,9 +944,39 @@
         .btn-back:hover { background: #004080; color: #ffffff; }
         .btn-next { background: #004080; color: #ffffff; }
         .btn-next:hover { background: #0056b3; border-color: #0056b3; }
-        .btn-submit { background: #28a745; color: #ffffff; border-color: #28a745; }
+        .btn-submit { 
+            background: #28a745; 
+            color: #ffffff; 
+            border-color: #28a745;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            position: relative;
+            z-index: 200;
+        }
         .btn-submit:hover:not(:disabled) { background: #218838; border-color: #218838; }
-        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+        
+        /* Ensure navigation buttons are always clickable */
+        .navigation-buttons {
+            position: relative;
+            z-index: 100;
+            pointer-events: auto !important;
+        }
+        .navigation-buttons button,
+        .navigation-buttons .btn-nav,
+        .btn-submit,
+        .btn-next,
+        .btn-back {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            position: relative;
+            z-index: 101;
+        }
+        
+        /* Override any parent pointer-events for buttons */
+        button.btn-nav {
+            pointer-events: auto !important;
+        }
 
         /* VOUCHER MODAL - 4 Vouchers on A4 (2x2 Grid) */
         .voucher-modal {
@@ -2745,7 +2775,7 @@
                 html += '<div class="navigation-buttons">';
                 if (sectionNum > 1) html += '<button type="button" class="btn-nav btn-back" onclick="previousSection()">← BACK</button>';
                 if (isLastSection) {
-                    html += '<button type="submit" class="btn-nav btn-submit">SUBMIT</button>';
+                    html += '<button type="button" class="btn-nav btn-submit" onclick="submitForm()">SUBMIT</button>';
                 } else {
                     html += '<button type="button" class="btn-nav btn-next" onclick="nextSection()">NEXT →</button>';
                 }
@@ -3934,6 +3964,16 @@
         // ============================================
         // FORM SUBMISSION
         // ============================================
+        function submitForm() {
+            // Create a fake event object for handleFormSubmit
+            const form = document.getElementById('dataForm');
+            const fakeEvent = {
+                preventDefault: () => {},
+                target: form
+            };
+            handleFormSubmit(fakeEvent);
+        }
+        
         async function handleFormSubmit(e) {
             e.preventDefault();
             
