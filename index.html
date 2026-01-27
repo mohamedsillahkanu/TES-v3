@@ -676,6 +676,26 @@
 
         /* FORM ELEMENTS */
         .form-group { margin-bottom: 20px; width: 100%; }
+        .form-group.auto-filled {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+        }
+        .form-group.auto-filled .form-label::after {
+            content: ' 🔒 (Auto-filled - Read Only)';
+            color: #28a745;
+            font-size: 11px;
+            font-weight: normal;
+        }
+        .form-group.auto-filled input[type="radio"] {
+            pointer-events: none;
+        }
+        .form-group.auto-filled input[type="radio"]:disabled + label,
+        .form-group.auto-filled .checkbox-label {
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
         .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
         .form-row .form-group { flex: 1; min-width: 200px; }
         .form-label {
@@ -962,38 +982,40 @@
             box-sizing: border-box;
         }
         
-        /* 2x2 Grid */
+        /* Single Voucher Layout */
         .voucher-grid-2x2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 6mm;
-            height: calc(297mm - 16mm);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
         
-        /* Individual Voucher Card */
+        /* Individual Voucher Card - Larger single card */
         .voucher-card-mini {
-            border: 2px solid #004080;
-            border-radius: 8px;
+            border: 3px solid #004080;
+            border-radius: 12px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             background: #ffffff;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
         
         /* Card Header */
         .voucher-mini-header {
             background: linear-gradient(135deg, #004080 0%, #0055aa 100%);
-            padding: 10px 12px;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
         .voucher-mini-logo {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             flex-shrink: 0;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
         }
         .voucher-mini-logo svg {
@@ -1003,9 +1025,9 @@
         }
         .voucher-mini-title {
             color: #ffffff;
-            font-size: 11px;
+            font-size: 14px;
             font-weight: 700;
-            line-height: 1.3;
+            line-height: 1.4;
             text-align: left;
         }
         .voucher-mini-title span {
@@ -1335,8 +1357,9 @@
             margin-bottom: 10px;
             text-align: center;
         }
-        .scan-panel-title { font-size: 18px; color: #17a2b8; margin-bottom: 10px; }
+        .scan-panel-title { font-size: 18px; color: #17a2b8; margin-bottom: 10px; font-weight: 700; }
         .scan-panel-desc { font-size: 13px; color: #666; margin-bottom: 20px; }
+        .scan-type-options { display: flex; flex-direction: column; gap: 15px; align-items: center; }
         .scan-voucher-btn {
             background: #17a2b8;
             color: #ffffff;
@@ -1350,6 +1373,161 @@
             letter-spacing: 1px;
         }
         .scan-voucher-btn:hover { background: #138496; }
+        .scan-divider { 
+            display: flex; 
+            align-items: center; 
+            width: 100%; 
+            margin: 10px 0;
+        }
+        .scan-divider::before, .scan-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #17a2b8;
+        }
+        .scan-divider span {
+            padding: 0 15px;
+            color: #17a2b8;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .type-patient-id {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .type-patient-id label {
+            font-size: 14px;
+            color: #333;
+            font-weight: 600;
+            text-align: left;
+        }
+        .patient-id-input {
+            padding: 12px 15px;
+            border: 2px solid #17a2b8;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: monospace;
+            text-transform: uppercase;
+        }
+        .patient-id-input:focus {
+            outline: none;
+            border-color: #004080;
+            box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+        }
+        .search-patient-btn {
+            background: #004080;
+            color: #ffffff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Oswald', Arial, sans-serif;
+        }
+        .search-patient-btn:hover { background: #003060; }
+
+        /* PATIENT CONFIRMATION MODAL */
+        .patient-confirm-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3500;
+        }
+        .patient-confirm-content {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 450px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .patient-confirm-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .patient-confirm-title {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .patient-confirm-close {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .patient-confirm-body {
+            padding: 20px;
+        }
+        .patient-confirm-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .patient-confirm-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .patient-confirm-label {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+        .patient-confirm-value {
+            font-size: 14px;
+            color: #004080;
+            font-weight: 700;
+        }
+        .patient-status-active {
+            color: #28a745 !important;
+        }
+        .patient-status-withdrawn {
+            color: #dc3545 !important;
+        }
+        .patient-confirm-footer {
+            padding: 15px 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            border-top: 1px solid #e0e0e0;
+        }
+        .patient-confirm-btn {
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-family: 'Oswald', Arial, sans-serif;
+        }
+        .patient-confirm-btn.cancel {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #dee2e6;
+        }
+        .patient-confirm-btn.continue {
+            background: #28a745;
+            color: #ffffff;
+        }
+        .patient-confirm-btn.continue:hover { background: #218838; }
+        .patient-confirm-btn.continue:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
 
         /* PATIENT INFO BAR */
         .patient-info-bar {
@@ -1454,7 +1632,7 @@
 
             <div class="controls-bar">
                 <button class="control-btn new-btn" onclick="startNewScreening()">+ NEW SCREENING</button>
-                <button class="control-btn scan-btn" onclick="startCaseReportForm()">📱 FOLLOW-UP (SCAN)</button>
+                <button class="control-btn scan-btn" onclick="startCaseReportForm()">📋 FOLLOW-UP</button>
                 <button class="control-btn" onclick="openPatientsModal()">PATIENTS (<span id="patientCountBadge">0</span>)</button>
                 <button class="control-btn view-data-btn" onclick="openViewDataModal()">VIEW DATA</button>
                 <button class="control-btn dashboard-btn" onclick="openDashboard()">DASHBOARD</button>
@@ -1483,11 +1661,78 @@
                 <button class="cancel-mode-btn" onclick="cancelCurrentMode()">CANCEL</button>
             </div>
 
-            <!-- Scan Voucher Panel (shown when Case Report Form selected) -->
+            <!-- Scan/Type Patient ID Panel (shown when Follow-Up selected) -->
             <div class="scan-panel" id="scanPanel" style="display: none;">
-                <div class="scan-panel-title">📱 SCAN VOUCHER FOR FOLLOW-UP</div>
-                <p class="scan-panel-desc">Patient must present their voucher. Scan the QR code to proceed with follow-up visit.</p>
-                <button class="scan-voucher-btn" onclick="openScannerModal()">📷 SCAN VOUCHER QR CODE</button>
+                <div class="scan-panel-title">📋 FOLLOW-UP VISIT</div>
+                <p class="scan-panel-desc">Identify the patient by scanning their voucher QR code OR typing their Patient ID.</p>
+                
+                <div class="scan-type-options">
+                    <button class="scan-voucher-btn" onclick="openScannerModal()">📷 SCAN VOUCHER QR CODE</button>
+                    
+                    <div class="scan-divider">
+                        <span>OR</span>
+                    </div>
+                    
+                    <div class="type-patient-id">
+                        <label for="typePatientId">Type Patient ID:</label>
+                        <input type="text" id="typePatientId" placeholder="e.g., TES-20260126-143025_MSK" class="patient-id-input">
+                        <button class="search-patient-btn" onclick="searchPatientById()">🔍 SEARCH</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient Confirmation Modal -->
+            <div class="patient-confirm-modal" id="patientConfirmModal" style="display: none;">
+                <div class="patient-confirm-content">
+                    <div class="patient-confirm-header">
+                        <span class="patient-confirm-title">✅ PATIENT FOUND</span>
+                        <button class="patient-confirm-close" onclick="closePatientConfirmModal()">&times;</button>
+                    </div>
+                    <div class="patient-confirm-body">
+                        <div class="patient-confirm-info">
+                            <div class="patient-confirm-row">
+                                <span class="patient-confirm-label">Patient ID:</span>
+                                <span class="patient-confirm-value" id="confirmPatientId">---</span>
+                            </div>
+                            <div class="patient-confirm-row">
+                                <span class="patient-confirm-label">Name:</span>
+                                <span class="patient-confirm-value" id="confirmPatientName">---</span>
+                            </div>
+                            <div class="patient-confirm-row">
+                                <span class="patient-confirm-label">Age:</span>
+                                <span class="patient-confirm-value" id="confirmPatientAge">---</span>
+                            </div>
+                            <div class="patient-confirm-row">
+                                <span class="patient-confirm-label">Sex:</span>
+                                <span class="patient-confirm-value" id="confirmPatientSex">---</span>
+                            </div>
+                            <div class="patient-confirm-row">
+                                <span class="patient-confirm-label">Health Facility:</span>
+                                <span class="patient-confirm-value" id="confirmPatientHF">---</span>
+                            </div>
+                            <div class="patient-confirm-row">
+                                <span class="patient-confirm-label">Medicine:</span>
+                                <span class="patient-confirm-value" id="confirmPatientMedicine">---</span>
+                            </div>
+                            <div class="patient-confirm-row">
+                                <span class="patient-confirm-label">Enrollment Date:</span>
+                                <span class="patient-confirm-value" id="confirmPatientEnrollDate">---</span>
+                            </div>
+                            <div class="patient-confirm-row">
+                                <span class="patient-confirm-label">Completed Days:</span>
+                                <span class="patient-confirm-value" id="confirmPatientCompletedDays">---</span>
+                            </div>
+                            <div class="patient-confirm-row status-row" id="confirmPatientStatusRow">
+                                <span class="patient-confirm-label">Status:</span>
+                                <span class="patient-confirm-value patient-status-active" id="confirmPatientStatus">ACTIVE</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="patient-confirm-footer">
+                        <button class="patient-confirm-btn cancel" onclick="closePatientConfirmModal()">Cancel</button>
+                        <button class="patient-confirm-btn continue" id="confirmContinueBtn" onclick="continueWithPatient()">Continue to Follow-Up →</button>
+                    </div>
+                </div>
             </div>
 
             <div class="day-selector" id="daySelector">
@@ -1550,17 +1795,17 @@
         </div>
     </div>
 
-    <!-- VOUCHER MODAL - 4 Vouchers on A4 (2x2 Grid) -->
+    <!-- VOUCHER MODAL - Single Voucher -->
     <div class="voucher-modal" id="voucherModal">
         <div class="voucher-container">
             <div class="voucher-header">
-                <span class="voucher-title">🎫 PATIENT VOUCHERS (4 per page)</span>
+                <span class="voucher-title">🎫 PATIENT VOUCHER</span>
                 <button class="voucher-close" onclick="closeVoucherModal()">&times;</button>
             </div>
             <div class="voucher-content">
                 <div class="voucher-a4-page" id="voucherA4Page">
                     <div class="voucher-grid-2x2" id="voucherGrid">
-                        <!-- 4 voucher cards will be generated here -->
+                        <!-- Single voucher card will be generated here -->
                     </div>
                 </div>
                 
@@ -2001,7 +2246,7 @@
                 fields: [
                     { name: 'history_of_fever_24h', label: 'History of fever in previous 24 h?', type: 'radio_group', options: ['Yes', 'No'], required: true },
                     { name: 'temperature', label: 'Temperature (°C)', type: 'number', required: true },
-                    { name: 'temp_method', label: '', type: 'checkbox_group', options: ['Axillary/Infrared'], required: false }
+                    { name: 'temp_method', label: 'Temperature measured by Axillary/Infrared method?', type: 'radio_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
@@ -2017,16 +2262,31 @@
                 ]
             },
             {
-                title: 'Clinical Assessment',
-                description: 'Additional clinical questions for eligibility',
+                title: 'Inclusion Criteria',
+                description: 'All criteria must be met (Yes) for patient to be eligible. Auto-calculated fields are pre-filled based on your responses above.',
+                isInclusionCriteria: true,
                 fields: [
-                    { name: 'danger_signs_present', label: 'Presence of general danger signs or signs of severe malaria?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'able_to_swallow', label: 'Is the patient able to swallow oral medication?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'willing_to_comply', label: 'Is caregiver willing to comply with study protocol for follow-up visits?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'severe_malnutrition', label: 'Does patient have severe malnutrition (MUAC <110mm)?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'other_febrile_conditions', label: 'Other febrile conditions (measles, acute LRTI, severe diarrhea) or chronic diseases?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'interfering_medications', label: 'Regular medication which may interfere with antimalarial pharmacokinetics?', type: 'radio_group', options: ['Yes', 'No'], required: true },
-                    { name: 'hypersensitivity_history', label: 'History of hypersensitivity reactions to test medicines?', type: 'radio_group', options: ['Yes', 'No'], required: true }
+                    { name: 'ic_age', label: 'Age between 6 months to 59 months?', type: 'radio_group', options: ['Yes', 'No'], required: true, autoCalculate: 'age', readonly: true },
+                    { name: 'ic_mono_infection', label: 'Mono-infection with P. falciparum detected by microscopy?', type: 'radio_group', options: ['Yes', 'No'], required: true, autoCalculate: 'species', readonly: true },
+                    { name: 'ic_parasitaemia', label: 'Parasitaemia of 2,000 – 200,000/µl asexual forms?', type: 'radio_group', options: ['Yes', 'No'], required: true, autoCalculate: 'parasitaemia', readonly: true },
+                    { name: 'ic_fever', label: 'Temperature ≥37.5°C or history of fever within the last 24 hours?', type: 'radio_group', options: ['Yes', 'No'], required: true, autoCalculate: 'fever', readonly: true },
+                    { name: 'ic_oral_meds', label: 'Ability to swallow oral medication?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_comply', label: 'Ability and willingness to comply with study protocol?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ic_consent', label: 'Informed consent from parent/guardian obtained?', type: 'radio_group', options: ['Yes', 'No'], required: true, autoCalculate: 'consent', readonly: true }
+                ]
+            },
+            {
+                title: 'Exclusion Criteria',
+                description: 'Patient is NOT eligible if ANY of these criteria are present (Yes). Auto-calculated fields are pre-filled.',
+                isExclusionCriteria: true,
+                fields: [
+                    { name: 'ec_danger_signs', label: 'Presence of general danger signs or signs of severe falciparum malaria?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_weight_under_5kg', label: 'Weight under 5 kg?', type: 'radio_group', options: ['Yes', 'No'], required: true, autoCalculate: 'weight', readonly: true },
+                    { name: 'ec_mixed_infection', label: 'Mixed or mono-infection with another Plasmodium species?', type: 'radio_group', options: ['Yes', 'No'], required: true, autoCalculate: 'species_exclusion', readonly: true },
+                    { name: 'ec_malnutrition', label: 'Severe malnutrition (MUAC <110mm)?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_other_febrile', label: 'Other febrile conditions (measles, acute LRTI, severe diarrhea) or known chronic/severe diseases?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_interfering_meds', label: 'Regular medication which may interfere with antimalarial pharmacokinetics?', type: 'radio_group', options: ['Yes', 'No'], required: true },
+                    { name: 'ec_hypersensitivity', label: 'History of hypersensitivity reactions or contraindications to test medicines?', type: 'radio_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
@@ -2115,7 +2375,7 @@
                     { name: 'visit_date', label: 'Date of visit (dd-mmm-yyyy)', type: 'date', required: true },
                     { name: 'danger_signs_present', label: 'Presence of danger signs or signs of severe or complicated malaria?', type: 'radio_group', options: ['Yes', 'No'], required: true, note: 'If yes, perform thick blood smear.' },
                     { name: 'temperature', label: 'Temperature (°C)', type: 'number', required: true },
-                    { name: 'temp_method', label: '', type: 'checkbox_group', options: ['Axillary/Infrared'], required: false }
+                    { name: 'temp_method', label: 'Temperature measured by Axillary/Infrared method?', type: 'radio_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
@@ -2172,7 +2432,7 @@
                     { name: 'danger_signs_present', label: 'Presence of danger signs or signs of severe or complicated malaria?', type: 'radio_group', options: ['Yes', 'No'], required: true },
                     { name: 'history_of_fever_24h', label: 'History of fever within previous 24 h?', type: 'radio_group', options: ['Yes', 'No'], required: true },
                     { name: 'temperature', label: 'Temperature (°C)', type: 'number', required: true },
-                    { name: 'temp_method', label: '', type: 'checkbox_group', options: ['Axillary/Infrared'], required: false }
+                    { name: 'temp_method', label: 'Temperature measured by Axillary/Infrared method?', type: 'radio_group', options: ['Yes', 'No'], required: true }
                 ]
             },
             {
@@ -2368,8 +2628,12 @@
             document.getElementById('daySelector').classList.remove('show');
             document.getElementById('modeIndicator').style.display = 'none';
             
+            // Clear type input
+            const typeInput = document.getElementById('typePatientId');
+            if (typeInput) typeInput.value = '';
+            
             state.currentMode = 'followup';
-            showNotification('📱 Scan patient voucher QR code to proceed with follow-up', 'info');
+            showNotification('📋 Scan voucher QR code or type Patient ID to proceed with follow-up', 'info');
             window.scrollTo({ top: document.getElementById('scanPanel').offsetTop - 20, behavior: 'smooth' });
         }
 
@@ -2901,18 +3165,49 @@
             const noRadio = document.querySelector('input[name="other_species_present"][value="No"]');
             
             if (yesRadio && noRadio) {
-                if (shouldBeYes) {
-                    yesRadio.checked = true;
-                    noRadio.checked = false;
-                } else if (checkedSpecies.length === 1 && checkedSpecies[0] === 'P. falciparum') {
-                    // Only P. falciparum selected - auto-select No
-                    yesRadio.checked = false;
-                    noRadio.checked = true;
+                // Only auto-fill if at least one species is selected
+                if (checkedSpecies.length > 0) {
+                    if (shouldBeYes) {
+                        yesRadio.checked = true;
+                        noRadio.checked = false;
+                    } else if (checkedSpecies.length === 1 && checkedSpecies[0] === 'P. falciparum') {
+                        // Only P. falciparum selected - auto-select No
+                        yesRadio.checked = false;
+                        noRadio.checked = true;
+                    }
+                    
+                    // Disable the radio buttons so user cannot change them
+                    yesRadio.disabled = true;
+                    noRadio.disabled = true;
+                    yesRadio.style.cursor = 'not-allowed';
+                    noRadio.style.cursor = 'not-allowed';
+                    
+                    // Add visual indicator for auto-filled
+                    const formGroup = yesRadio.closest('.form-group');
+                    if (formGroup && !formGroup.classList.contains('auto-filled')) {
+                        formGroup.classList.add('auto-filled');
+                    }
+                    
+                    // Trigger change event to update conditional visibility
+                    const event = new Event('change', { bubbles: true });
+                    (shouldBeYes ? yesRadio : noRadio).dispatchEvent(event);
+                } else {
+                    // No species selected - enable radio buttons for manual selection
+                    yesRadio.disabled = false;
+                    noRadio.disabled = false;
+                    yesRadio.style.cursor = 'pointer';
+                    noRadio.style.cursor = 'pointer';
+                    
+                    // Remove auto-filled styling
+                    const formGroup = yesRadio.closest('.form-group');
+                    if (formGroup) {
+                        formGroup.classList.remove('auto-filled');
+                    }
                 }
-                // Trigger change event to update conditional visibility
-                const event = new Event('change', { bubbles: true });
-                (shouldBeYes ? yesRadio : noRadio).dispatchEvent(event);
             }
+            
+            // Update inclusion/exclusion criteria
+            autoFillInclusionExclusion();
         }
 
         // ============================================
@@ -3070,32 +3365,48 @@
         // ELIGIBILITY CALCULATOR
         // ============================================
         function setupEligibilityCalculator() {
-            // Fields that affect eligibility calculation
-            const eligibilityFields = [
+            // Fields that affect eligibility calculation (source fields)
+            const sourceFields = [
                 'estimated_age_years', 'estimated_age_months', 'weight_kg', 
                 'temperature', 'history_of_fever_24h',
                 'species', 'other_species_present', 'approx_parasite_count',
-                'danger_signs_present', 'able_to_swallow', 'willing_to_comply',
-                'severe_malnutrition', 'other_febrile_conditions', 
-                'interfering_medications', 'hypersensitivity_history',
                 'consent_copy_given'
             ];
             
-            // Add change listeners to all eligibility fields
-            eligibilityFields.forEach(fieldName => {
+            // Inclusion/Exclusion criteria fields
+            const criteriaFields = [
+                'ic_age', 'ic_mono_infection', 'ic_parasitaemia', 'ic_fever', 
+                'ic_oral_meds', 'ic_comply', 'ic_consent',
+                'ec_danger_signs', 'ec_weight_under_5kg', 'ec_mixed_infection',
+                'ec_malnutrition', 'ec_other_febrile', 'ec_interfering_meds', 'ec_hypersensitivity'
+            ];
+            
+            // Add change listeners to source fields for auto-prefill
+            sourceFields.forEach(fieldName => {
                 const inputs = document.querySelectorAll(`input[name="${fieldName}"], select[name="${fieldName}"]`);
                 inputs.forEach(input => {
-                    input.addEventListener('change', calculateEligibility);
-                    input.addEventListener('input', calculateEligibility);
+                    input.addEventListener('change', autoFillInclusionExclusion);
+                    input.addEventListener('input', autoFillInclusionExclusion);
                 });
             });
             
-            // Initial calculation
-            setTimeout(calculateEligibility, 500);
+            // Add change listeners to criteria fields for eligibility calculation
+            criteriaFields.forEach(fieldName => {
+                const inputs = document.querySelectorAll(`input[name="${fieldName}"]`);
+                inputs.forEach(input => {
+                    input.addEventListener('change', calculateEligibility);
+                });
+            });
+            
+            // Initial auto-fill and calculation
+            setTimeout(() => {
+                autoFillInclusionExclusion();
+                calculateEligibility();
+            }, 500);
         }
-
-        function calculateEligibility() {
-            // Get form values
+        
+        function autoFillInclusionExclusion() {
+            // Get source values
             const ageYears = parseInt(document.querySelector('input[name="estimated_age_years"]')?.value) || 0;
             const ageMonths = parseInt(document.querySelector('input[name="estimated_age_months"]')?.value) || 0;
             const totalMonths = (ageYears * 12) + ageMonths;
@@ -3108,108 +3419,117 @@
             const otherSpeciesPresent = getRadioValue('other_species_present');
             const parasiteCount = parseFloat(document.querySelector('input[name="approx_parasite_count"]')?.value) || 0;
             
-            const dangerSigns = getRadioValue('danger_signs_present');
-            const ableToSwallow = getRadioValue('able_to_swallow');
-            const willingToComply = getRadioValue('willing_to_comply');
-            const severeMalnutrition = getRadioValue('severe_malnutrition');
-            const otherFebrile = getRadioValue('other_febrile_conditions');
-            const interferingMeds = getRadioValue('interfering_medications');
-            const hypersensitivity = getRadioValue('hypersensitivity_history');
-            
-            // Check consent from CONSENT_SECTIONS (consent_copy_given checkbox)
             const consentCopyGiven = document.querySelector('input[name="consent_copy_given"]:checked');
-            const consentObtained = consentCopyGiven !== null;
             
-            // Auto-calculate inclusion criteria
-            const inclusionCriteria = [
-                { 
-                    label: 'Age 6-59 months',
-                    met: totalMonths >= 6 && totalMonths <= 59,
-                    value: totalMonths > 0 ? `${totalMonths} months` : 'Not entered',
-                    filled: totalMonths > 0
-                },
-                { 
-                    label: 'Mono-infection with P. falciparum',
-                    met: speciesChecked.includes('P. falciparum') && speciesChecked.length === 1 && otherSpeciesPresent === 'No',
-                    value: speciesChecked.length > 0 ? speciesChecked.join(', ') : 'Not selected',
-                    filled: speciesChecked.length > 0 && otherSpeciesPresent !== null
-                },
-                { 
-                    label: 'Parasitaemia 2,000-200,000/µl',
-                    met: parasiteCount >= 2000 && parasiteCount <= 200000,
-                    value: parasiteCount > 0 ? parasiteCount.toLocaleString() + '/µl' : 'Not entered',
-                    filled: parasiteCount > 0
-                },
-                { 
-                    label: 'Fever ≥37.5°C or history of fever',
-                    met: temperature >= 37.5 || historyOfFever === 'Yes',
-                    value: temperature > 0 ? `${temperature}°C` : 'Not entered',
-                    filled: temperature > 0 || historyOfFever !== null
-                },
-                { 
-                    label: 'Able to swallow oral medication',
-                    met: ableToSwallow === 'Yes',
-                    value: ableToSwallow || 'Not answered',
-                    filled: ableToSwallow !== null
-                },
-                { 
-                    label: 'Willing to comply with protocol',
-                    met: willingToComply === 'Yes',
-                    value: willingToComply || 'Not answered',
-                    filled: willingToComply !== null
-                },
-                { 
-                    label: 'Informed consent obtained',
-                    met: consentObtained,
-                    value: consentObtained ? 'Yes (from consent section)' : 'Not completed',
-                    filled: true // Consent section is always checked
+            // Auto-fill inclusion criteria
+            // ic_age - Age 6-59 months
+            if (totalMonths > 0) {
+                setRadioValue('ic_age', totalMonths >= 6 && totalMonths <= 59 ? 'Yes' : 'No');
+            }
+            
+            // ic_mono_infection - Mono-infection P. falciparum
+            if (speciesChecked.length > 0 && otherSpeciesPresent !== null) {
+                const isMono = speciesChecked.includes('P. falciparum') && speciesChecked.length === 1 && otherSpeciesPresent === 'No';
+                setRadioValue('ic_mono_infection', isMono ? 'Yes' : 'No');
+            }
+            
+            // ic_parasitaemia - Parasitaemia 2,000-200,000/µl
+            if (parasiteCount > 0) {
+                setRadioValue('ic_parasitaemia', parasiteCount >= 2000 && parasiteCount <= 200000 ? 'Yes' : 'No');
+            }
+            
+            // ic_fever - Fever ≥37.5°C or history
+            if (temperature > 0 || historyOfFever !== null) {
+                const hasFever = temperature >= 37.5 || historyOfFever === 'Yes';
+                setRadioValue('ic_fever', hasFever ? 'Yes' : 'No');
+            }
+            
+            // ic_consent - Consent obtained
+            if (consentCopyGiven !== null) {
+                setRadioValue('ic_consent', 'Yes');
+            }
+            
+            // Auto-fill exclusion criteria
+            // ec_weight_under_5kg
+            if (weight > 0) {
+                setRadioValue('ec_weight_under_5kg', weight < 5 ? 'Yes' : 'No');
+            }
+            
+            // ec_mixed_infection
+            if (speciesChecked.length > 0 || otherSpeciesPresent !== null) {
+                const hasMixed = otherSpeciesPresent === 'Yes' || speciesChecked.length > 1 || 
+                                (speciesChecked.length === 1 && !speciesChecked.includes('P. falciparum'));
+                setRadioValue('ec_mixed_infection', hasMixed ? 'Yes' : 'No');
+            }
+            
+            // Trigger eligibility calculation after auto-fill
+            setTimeout(calculateEligibility, 100);
+        }
+        
+        function setRadioValue(fieldName, value, disableField = true) {
+            const radio = document.querySelector(`input[name="${fieldName}"][value="${value}"]`);
+            if (radio) {
+                radio.checked = true;
+                
+                // Disable all radios in this group if disableField is true
+                if (disableField) {
+                    const allRadios = document.querySelectorAll(`input[name="${fieldName}"]`);
+                    allRadios.forEach(r => {
+                        r.disabled = true;
+                        r.style.cursor = 'not-allowed';
+                    });
+                    
+                    // Add visual indicator for auto-filled
+                    const formGroup = radio.closest('.form-group');
+                    if (formGroup && !formGroup.classList.contains('auto-filled')) {
+                        formGroup.classList.add('auto-filled');
+                    }
                 }
+                
+                // Trigger change event
+                radio.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+
+        function calculateEligibility() {
+            // Get inclusion criteria values
+            const icAge = getRadioValue('ic_age');
+            const icMonoInfection = getRadioValue('ic_mono_infection');
+            const icParasitaemia = getRadioValue('ic_parasitaemia');
+            const icFever = getRadioValue('ic_fever');
+            const icOralMeds = getRadioValue('ic_oral_meds');
+            const icComply = getRadioValue('ic_comply');
+            const icConsent = getRadioValue('ic_consent');
+            
+            // Get exclusion criteria values
+            const ecDangerSigns = getRadioValue('ec_danger_signs');
+            const ecWeightUnder5 = getRadioValue('ec_weight_under_5kg');
+            const ecMixedInfection = getRadioValue('ec_mixed_infection');
+            const ecMalnutrition = getRadioValue('ec_malnutrition');
+            const ecOtherFebrile = getRadioValue('ec_other_febrile');
+            const ecInterferingMeds = getRadioValue('ec_interfering_meds');
+            const ecHypersensitivity = getRadioValue('ec_hypersensitivity');
+            
+            // Build inclusion criteria for display
+            const inclusionCriteria = [
+                { field: 'ic_age', label: 'Age 6-59 months', value: icAge },
+                { field: 'ic_mono_infection', label: 'Mono-infection P. falciparum', value: icMonoInfection },
+                { field: 'ic_parasitaemia', label: 'Parasitaemia 2,000-200,000/µl', value: icParasitaemia },
+                { field: 'ic_fever', label: 'Fever ≥37.5°C or history', value: icFever },
+                { field: 'ic_oral_meds', label: 'Ability to swallow oral meds', value: icOralMeds },
+                { field: 'ic_comply', label: 'Willingness to comply', value: icComply },
+                { field: 'ic_consent', label: 'Informed consent obtained', value: icConsent }
             ];
             
-            // Auto-calculate exclusion criteria
+            // Build exclusion criteria for display
             const exclusionCriteria = [
-                { 
-                    label: 'Danger signs or severe malaria',
-                    met: dangerSigns === 'Yes',
-                    value: dangerSigns || 'Not answered',
-                    filled: dangerSigns !== null
-                },
-                { 
-                    label: 'Weight under 5 kg',
-                    met: weight > 0 && weight < 5,
-                    value: weight > 0 ? `${weight} kg` : 'Not entered',
-                    filled: weight > 0
-                },
-                { 
-                    label: 'Mixed Plasmodium infection',
-                    met: otherSpeciesPresent === 'Yes' || speciesChecked.length > 1,
-                    value: otherSpeciesPresent || 'Not answered',
-                    filled: otherSpeciesPresent !== null
-                },
-                { 
-                    label: 'Severe malnutrition',
-                    met: severeMalnutrition === 'Yes',
-                    value: severeMalnutrition || 'Not answered',
-                    filled: severeMalnutrition !== null
-                },
-                { 
-                    label: 'Other febrile/chronic conditions',
-                    met: otherFebrile === 'Yes',
-                    value: otherFebrile || 'Not answered',
-                    filled: otherFebrile !== null
-                },
-                { 
-                    label: 'Interfering medications',
-                    met: interferingMeds === 'Yes',
-                    value: interferingMeds || 'Not answered',
-                    filled: interferingMeds !== null
-                },
-                { 
-                    label: 'Hypersensitivity to medicines',
-                    met: hypersensitivity === 'Yes',
-                    value: hypersensitivity || 'Not answered',
-                    filled: hypersensitivity !== null
-                }
+                { field: 'ec_danger_signs', label: 'Danger signs/severe malaria', value: ecDangerSigns },
+                { field: 'ec_weight_under_5kg', label: 'Weight under 5 kg', value: ecWeightUnder5 },
+                { field: 'ec_mixed_infection', label: 'Mixed Plasmodium infection', value: ecMixedInfection },
+                { field: 'ec_malnutrition', label: 'Severe malnutrition', value: ecMalnutrition },
+                { field: 'ec_other_febrile', label: 'Other febrile/chronic conditions', value: ecOtherFebrile },
+                { field: 'ec_interfering_meds', label: 'Interfering medications', value: ecInterferingMeds },
+                { field: 'ec_hypersensitivity', label: 'Hypersensitivity to medicines', value: ecHypersensitivity }
             ];
             
             let allInclusionMet = true;
@@ -3224,15 +3544,15 @@
                 let statusText = '--';
                 let itemClass = 'pending';
                 
-                if (!criterion.filled) {
+                if (criterion.value === null) {
                     allFieldsFilled = false;
-                } else if (criterion.met) {
+                } else if (criterion.value === 'Yes') {
                     statusClass = 'yes';
-                    statusText = '✓ MET';
+                    statusText = 'YES ✓';
                     itemClass = 'met';
-                } else {
+                } else if (criterion.value === 'No') {
                     statusClass = 'no';
-                    statusText = '✗ NOT MET';
+                    statusText = 'NO ✗';
                     itemClass = 'not-met';
                     allInclusionMet = false;
                     reasons.push(`Inclusion not met: ${criterion.label}`);
@@ -3240,7 +3560,6 @@
                 
                 inclusionHtml += `<div class="criteria-item ${itemClass}">
                     <span>${criterion.label}</span>
-                    <span class="criteria-value">${criterion.value}</span>
                     <span class="criteria-status ${statusClass}">${statusText}</span>
                 </div>`;
             });
@@ -3252,15 +3571,15 @@
                 let statusText = '--';
                 let itemClass = 'pending';
                 
-                if (!criterion.filled) {
+                if (criterion.value === null) {
                     allFieldsFilled = false;
-                } else if (!criterion.met) {
+                } else if (criterion.value === 'No') {
                     statusClass = 'yes';
-                    statusText = '✓ CLEAR';
+                    statusText = 'NO ✓';
                     itemClass = 'met';
-                } else {
+                } else if (criterion.value === 'Yes') {
                     statusClass = 'no';
-                    statusText = '✗ PRESENT';
+                    statusText = 'YES ✗';
                     itemClass = 'not-met';
                     anyExclusionMet = true;
                     reasons.push(`Exclusion present: ${criterion.label}`);
@@ -3268,7 +3587,6 @@
                 
                 exclusionHtml += `<div class="criteria-item ${itemClass}">
                     <span>${criterion.label}</span>
-                    <span class="criteria-value">${criterion.value}</span>
                     <span class="criteria-status ${statusClass}">${statusText}</span>
                 </div>`;
             });
@@ -3288,7 +3606,7 @@
             if (resultDiv && summaryDiv) {
                 if (!allFieldsFilled) {
                     resultDiv.className = 'eligibility-result pending';
-                    resultDiv.innerHTML = '⏳ COMPLETE ALL FIELDS TO SEE ELIGIBILITY';
+                    resultDiv.innerHTML = '⏳ COMPLETE ALL CRITERIA TO SEE ELIGIBILITY';
                     summaryDiv.className = 'eligibility-summary';
                 } else if (isEligible) {
                     resultDiv.className = 'eligibility-result eligible';
@@ -3588,6 +3906,13 @@
         async function handleFormSubmit(e) {
             e.preventDefault();
             
+            // Re-enable disabled fields temporarily so their values are included
+            const disabledFields = document.querySelectorAll('input:disabled, select:disabled');
+            disabledFields.forEach(field => {
+                field.disabled = false;
+                field.dataset.wasDisabled = 'true';
+            });
+            
             // Remove required from hidden fields before validation
             document.querySelectorAll('[data-show-if-field]').forEach(formGroup => {
                 if (formGroup.style.display === 'none') {
@@ -3600,6 +3925,12 @@
             const formData = new FormData(e.target);
             let patientId = document.getElementById('patient_id').value;
             const day = parseInt(document.getElementById('follow_up_day').value);
+            
+            // Re-disable the fields that were disabled
+            document.querySelectorAll('[data-was-disabled="true"]').forEach(field => {
+                field.disabled = true;
+                delete field.dataset.wasDisabled;
+            });
             
             // For screening, use patient_identity_number (which includes initials)
             if (state.currentMode === 'screening') {
@@ -3836,100 +4167,98 @@
             const patient = state.patients[patientId];
             if (!patient) return;
             
-            // Generate 4 identical voucher cards
+            // Generate single voucher card
             const grid = document.getElementById('voucherGrid');
             grid.innerHTML = '';
             
-            for (let i = 0; i < 4; i++) {
-                const card = document.createElement('div');
-                card.className = 'voucher-card-mini';
+            const card = document.createElement('div');
+            card.className = 'voucher-card-mini';
+            
+            card.innerHTML = `
+                <!-- Header -->
+                <div class="voucher-mini-header">
+                    <div class="voucher-mini-logo">
+                        <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="50" height="50" fill="#004080" rx="4"/>
+                            <text x="25" y="20" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="bold" font-family="Arial">ICF</text>
+                            <text x="25" y="32" text-anchor="middle" fill="#ffc107" font-size="8" font-weight="bold" font-family="Arial">SL</text>
+                            <text x="25" y="44" text-anchor="middle" fill="#ffffff" font-size="6" font-family="Arial">2026</text>
+                        </svg>
+                    </div>
+                    <div class="voucher-mini-title">
+                        TES 2026 - SIERRA LEONE
+                        <span>National Malaria Control Programme</span>
+                    </div>
+                </div>
                 
-                card.innerHTML = `
-                    <!-- Header -->
-                    <div class="voucher-mini-header">
-                        <div class="voucher-mini-logo">
-                            <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
-                                <rect width="50" height="50" fill="#004080" rx="4"/>
-                                <text x="25" y="20" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="bold" font-family="Arial">ICF</text>
-                                <text x="25" y="32" text-anchor="middle" fill="#ffc107" font-size="8" font-weight="bold" font-family="Arial">SL</text>
-                                <text x="25" y="44" text-anchor="middle" fill="#ffffff" font-size="6" font-family="Arial">2026</text>
-                            </svg>
+                <!-- Patient ID -->
+                <div class="voucher-mini-id">
+                    <div class="voucher-mini-id-label">Patient ID</div>
+                    <div class="voucher-mini-id-value">${patientId}</div>
+                </div>
+                
+                <!-- Body - Info fields then QR below -->
+                <div class="voucher-mini-body">
+                    <div class="voucher-mini-info">
+                        <div class="voucher-mini-field full-width">
+                            <div class="voucher-mini-field-label">Patient Name</div>
+                            <div class="voucher-mini-field-value">${patient.patientName || '---'}</div>
                         </div>
-                        <div class="voucher-mini-title">
-                            TES 2026 - SIERRA LEONE
-                            <span>National Malaria Control Programme</span>
+                        <div class="voucher-mini-field">
+                            <div class="voucher-mini-field-label">Date of Birth</div>
+                            <div class="voucher-mini-field-value">${patient.dateOfBirth || '---'}</div>
+                        </div>
+                        <div class="voucher-mini-field">
+                            <div class="voucher-mini-field-label">Age</div>
+                            <div class="voucher-mini-field-value">${patient.ageDisplay || (patient.ageInMonths ? patient.ageInMonths + ' months' : '---')}</div>
+                        </div>
+                        <div class="voucher-mini-field full-width">
+                            <div class="voucher-mini-field-label">Health Facility</div>
+                            <div class="voucher-mini-field-value">${patient.healthCentre || '---'}</div>
+                        </div>
+                        <div class="voucher-mini-field full-width">
+                            <div class="voucher-mini-field-label">Address / Landmark</div>
+                            <div class="voucher-mini-field-value">${patient.address || '---'}</div>
                         </div>
                     </div>
                     
-                    <!-- Patient ID -->
-                    <div class="voucher-mini-id">
-                        <div class="voucher-mini-id-label">Patient ID</div>
-                        <div class="voucher-mini-id-value">${patientId}</div>
+                    <!-- QR Code - Bigger, centered below -->
+                    <div class="voucher-mini-qr">
+                        <div class="voucher-mini-qr-box" id="qr_voucher"></div>
+                        <div class="voucher-mini-qr-text">Scan QR Code for Follow-up Visits</div>
                     </div>
-                    
-                    <!-- Body - Info fields then QR below -->
-                    <div class="voucher-mini-body">
-                        <div class="voucher-mini-info">
-                            <div class="voucher-mini-field full-width">
-                                <div class="voucher-mini-field-label">Patient Name</div>
-                                <div class="voucher-mini-field-value">${patient.patientName || '---'}</div>
-                            </div>
-                            <div class="voucher-mini-field">
-                                <div class="voucher-mini-field-label">Date of Birth</div>
-                                <div class="voucher-mini-field-value">${patient.dateOfBirth || '---'}</div>
-                            </div>
-                            <div class="voucher-mini-field">
-                                <div class="voucher-mini-field-label">Age</div>
-                                <div class="voucher-mini-field-value">${patient.ageDisplay || (patient.ageInMonths ? patient.ageInMonths + ' months' : '---')}</div>
-                            </div>
-                            <div class="voucher-mini-field full-width">
-                                <div class="voucher-mini-field-label">Health Facility</div>
-                                <div class="voucher-mini-field-value">${patient.healthCentre || '---'}</div>
-                            </div>
-                            <div class="voucher-mini-field full-width">
-                                <div class="voucher-mini-field-label">Address / Landmark</div>
-                                <div class="voucher-mini-field-value">${patient.address || '---'}</div>
-                            </div>
-                        </div>
-                        
-                        <!-- QR Code - Bigger, centered below -->
-                        <div class="voucher-mini-qr">
-                            <div class="voucher-mini-qr-box" id="qr_${i}"></div>
-                            <div class="voucher-mini-qr-text">Scan QR Code to Verify</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Footer -->
-                    <div class="voucher-mini-footer">
-                        <div class="voucher-mini-footer-text">Present this voucher at each follow-up visit</div>
-                        <div class="voucher-mini-footer-days">ICF-SL © 2026</div>
-                    </div>
-                `;
+                </div>
                 
-                grid.appendChild(card);
-                
-                // Generate bigger QR code for this card
-                setTimeout(() => {
-                    const qrContainer = document.getElementById(`qr_${i}`);
-                    if (qrContainer) {
-                        const qrData = JSON.stringify({
-                            id: patientId,
-                            name: patient.patientName,
-                            hf: patient.healthCentre,
-                            dob: patient.dateOfBirth
-                        });
-                        
-                        new QRCode(qrContainer, {
-                            text: qrData,
-                            width: 100,
-                            height: 100,
-                            colorDark: "#004080",
-                            colorLight: "#ffffff",
-                            correctLevel: QRCode.CorrectLevel.M
-                        });
-                    }
-                }, i * 100);
-            }
+                <!-- Footer -->
+                <div class="voucher-mini-footer">
+                    <div class="voucher-mini-footer-text">Present this voucher at each follow-up visit</div>
+                    <div class="voucher-mini-footer-days">ICF-SL © 2026</div>
+                </div>
+            `;
+            
+            grid.appendChild(card);
+            
+            // Generate QR code
+            setTimeout(() => {
+                const qrContainer = document.getElementById('qr_voucher');
+                if (qrContainer) {
+                    const qrData = JSON.stringify({
+                        id: patientId,
+                        name: patient.patientName,
+                        hf: patient.healthCentre,
+                        dob: patient.dateOfBirth
+                    });
+                    
+                    new QRCode(qrContainer, {
+                        text: qrData,
+                        width: 150,
+                        height: 150,
+                        colorDark: "#004080",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+            }, 100);
             
             document.getElementById('voucherModal').classList.add('show');
         }
@@ -4044,27 +4373,125 @@
                     showNotification('Patient not found in local database', 'error');
                     return;
                 }
-                selectPatientForFollowup(patientId, scannedDay, true); // true = from QR scan
+                // Show confirmation modal with patient info
+                showPatientConfirmModal(patientId, scannedDay);
             } catch (e) {
                 if (state.patients[decodedText]) {
-                    selectPatientForFollowup(decodedText, null, true); // true = from QR scan
+                    // Show confirmation modal with patient info
+                    showPatientConfirmModal(decodedText, null);
                 } else {
                     showNotification('Invalid QR code or patient not found', 'error');
                 }
+            }
+        }
+        
+        function searchPatientById() {
+            const patientIdInput = document.getElementById('typePatientId');
+            const patientId = patientIdInput.value.trim().toUpperCase();
+            
+            if (!patientId) {
+                showNotification('Please enter a Patient ID', 'warning');
+                return;
+            }
+            
+            // Search for exact match or partial match
+            let foundPatientId = null;
+            
+            if (state.patients[patientId]) {
+                foundPatientId = patientId;
+            } else {
+                // Try partial match
+                const matchingIds = Object.keys(state.patients).filter(id => 
+                    id.toUpperCase().includes(patientId) || patientId.includes(id.toUpperCase())
+                );
+                if (matchingIds.length === 1) {
+                    foundPatientId = matchingIds[0];
+                } else if (matchingIds.length > 1) {
+                    showNotification(`Multiple patients found. Please enter complete ID.`, 'warning');
+                    return;
+                }
+            }
+            
+            if (foundPatientId) {
+                showPatientConfirmModal(foundPatientId, null);
+            } else {
+                showNotification('Patient not found. Please check the ID and try again.', 'error');
+            }
+        }
+        
+        function showPatientConfirmModal(patientId, preferredDay = null) {
+            const patient = state.patients[patientId];
+            if (!patient) {
+                showNotification('Patient not found', 'error');
+                return;
+            }
+            
+            // Store for later use
+            state.pendingPatientId = patientId;
+            state.pendingPreferredDay = preferredDay;
+            
+            // Populate modal with patient info
+            document.getElementById('confirmPatientId').textContent = patientId;
+            document.getElementById('confirmPatientName').textContent = patient.patientName || '---';
+            document.getElementById('confirmPatientAge').textContent = patient.ageDisplay || (patient.ageInMonths ? patient.ageInMonths + ' months' : '---');
+            document.getElementById('confirmPatientSex').textContent = patient.sex || '---';
+            document.getElementById('confirmPatientHF').textContent = patient.healthCentre || '---';
+            document.getElementById('confirmPatientMedicine').textContent = patient.studyMedicine || 'Not selected';
+            document.getElementById('confirmPatientEnrollDate').textContent = patient.enrollmentDate || '---';
+            
+            const completedDays = patient.completedDays || [];
+            document.getElementById('confirmPatientCompletedDays').textContent = completedDays.length > 0 ? completedDays.join(', ') : 'None yet';
+            
+            // Check withdrawal status
+            const statusElement = document.getElementById('confirmPatientStatus');
+            const statusRow = document.getElementById('confirmPatientStatusRow');
+            const continueBtn = document.getElementById('confirmContinueBtn');
+            
+            if (patient.isWithdrawn) {
+                statusElement.textContent = `OUT OF STUDY (Day ${patient.withdrawalDay}: ${patient.withdrawalReason})`;
+                statusElement.className = 'patient-confirm-value patient-status-withdrawn';
+                statusRow.style.background = '#ffe0e0';
+                continueBtn.disabled = true;
+                continueBtn.textContent = 'Patient is OUT OF STUDY';
+            } else {
+                statusElement.textContent = 'ACTIVE';
+                statusElement.className = 'patient-confirm-value patient-status-active';
+                statusRow.style.background = '#e0ffe0';
+                continueBtn.disabled = false;
+                continueBtn.textContent = 'Continue to Follow-Up →';
+            }
+            
+            // Show modal
+            document.getElementById('patientConfirmModal').style.display = 'flex';
+        }
+        
+        function closePatientConfirmModal() {
+            document.getElementById('patientConfirmModal').style.display = 'none';
+            state.pendingPatientId = null;
+            state.pendingPreferredDay = null;
+        }
+        
+        function continueWithPatient() {
+            const patientId = state.pendingPatientId;
+            const preferredDay = state.pendingPreferredDay;
+            
+            closePatientConfirmModal();
+            
+            if (patientId) {
+                selectPatientForFollowup(patientId, preferredDay, true);
             }
         }
 
         // ============================================
         // FOLLOW-UP
         // ============================================
-        function selectPatientForFollowup(patientId, preferredDay = null, fromQRScan = false) {
+        function selectPatientForFollowup(patientId, preferredDay = null, fromVerification = false) {
             const patient = state.patients[patientId];
             if (!patient) { showNotification('Patient not found', 'error'); return; }
             
-            // Require QR scan for follow-up visits
-            if (!fromQRScan) {
-                showNotification('📱 Please SCAN the patient voucher QR code to proceed with follow-up visit.', 'warning');
-                openScannerModal();
+            // Require verification (from scan or type + confirm modal)
+            if (!fromVerification) {
+                showNotification('📱 Please scan or type the patient ID to proceed with follow-up visit.', 'warning');
                 return;
             }
             
@@ -4347,7 +4774,7 @@
                         <div class="patient-actions">
                             ${isWithdrawn ? 
                                 `<button class="patient-action-btn disabled" disabled>OUT OF STUDY</button>` :
-                                `<button class="patient-action-btn followup" onclick="closePatientsModal(); openScannerModal()">📱 SCAN VOUCHER</button>`
+                                `<button class="patient-action-btn followup" onclick="closePatientsModal(); showPatientConfirmModal('${patient.patientId}', null)">📋 FOLLOW-UP</button>`
                             }
                             <button class="patient-action-btn voucher" onclick="showVouchersFromList('${patient.patientId}')">VOUCHERS</button>
                         </div>
@@ -5403,6 +5830,15 @@
         document.getElementById('viewDataModal').addEventListener('click', function(e) { if (e.target === this) closeViewDataModal(); });
         document.getElementById('dashboardModal').addEventListener('click', function(e) { if (e.target === this) closeDashboard(); });
         document.getElementById('dhis2Modal').addEventListener('click', function(e) { if (e.target === this) closeDhis2Modal(); });
+        document.getElementById('patientConfirmModal').addEventListener('click', function(e) { if (e.target === this) closePatientConfirmModal(); });
+        
+        // Enter key listener for patient ID input
+        document.getElementById('typePatientId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchPatientById();
+            }
+        });
 
         // ============================================
         // DHIS2 INTEGRATION
